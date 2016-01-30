@@ -48,13 +48,13 @@ function sendStockInfo(fromId, stockSign){
     if (!error && response.statusCode == 200) {
       try{
         var stockVal = JSON.parse(body.substring(3))[0];
-        var messageBody = stockVal.t +
+        var messageBody = stockVal.t + "\n" +
             // (stockVal.e)? " from \n"+stockVal.e:"\n"+
             stockVal.lt+"\n"+
             "Value:"+stockVal.l+"\n"+
             "Day Change: "+stockVal.c+" ("+stockVal.cp+"%)" +
             getNumberDiff(fromId, stockSign, parseFloat(stockVal.l));
-            
+
         bot.sendMessage(fromId, messageBody);
       }catch(e){}
     }
@@ -78,7 +78,7 @@ function getNumberDiff(fromId, stockSign, currentValue) {
     var diffNumber = currentValue - schedules[fromId][stockSign].numberToDiff;
     var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
 
-    return "\nDiff Change "+diffNumber+" ("+diffPercentage+"%)";
+    return "\nDiff Change "+diffNumber.toFixed(2)+" ("+diffPercentage.toFixed(2)+"%)";
   }else{
     return '';
   }
