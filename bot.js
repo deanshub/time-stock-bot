@@ -27,6 +27,7 @@ var botDescription="Hi, I\'m TimeStockBot\n"+
     "/graph <STOCK_SIGN> - stock 3 day graph\n"+
     "/stock <STOCK_SIGN> cancel - stop stock scheduling\n"+
     "/unstock <STOCK_SIGN> - same as /stock <STOCK_SIGN> cancel\n"+
+    "/diff <STOCK_SIGN> <NUMBER> - scheduled stocks will also show ratio to this number\n"+
     "\nExamples:\n"+
     "/stock fb\n"+
     "/stock fb every day at 10:00\n"+
@@ -35,6 +36,7 @@ var botDescription="Hi, I\'m TimeStockBot\n"+
 
 bot.onText(/\/help/, helpHandler);
 bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
+bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
 bot.onText(/\/unstock (.+)$/, cancelStockHandler);
 bot.onText(/\/stock (.+)$/, stockOnlyHandler);
 bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
@@ -47,10 +49,12 @@ function sendStockInfo(fromId, stockSign){
       try{
         var stockVal = JSON.parse(body.substring(3))[0];
         var messageBody = stockVal.t +
-            (stockVal.e)? " from \n"+stockVal.e:"\n"+
+            // (stockVal.e)? " from \n"+stockVal.e:"\n"+
             stockVal.lt+"\n"+
             "Value:"+stockVal.l+"\n"+
-            "Day Change: "+stockVal.c+" "+stockVal.cp+"%";
+            "Day Change: "+stockVal.c+" ("+stockVal.cp+"%)" +
+            getNumberDiff(fromId, stockSign, parseFloat(stockVal.l));
+            
         bot.sendMessage(fromId, messageBody);
       }catch(e){}
     }
@@ -66,6 +70,17 @@ function cancelStockScheduling(fromId, stockSign){
   }else{
     bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
     return false;
+  }
+}
+
+function getNumberDiff(fromId, stockSign, currentValue) {
+  if (schedules[fromId] && schedules[fromId][stockSign] && (schedules[fromId][stockSign].numberToDiff!==undefined)){
+    var diffNumber = currentValue - schedules[fromId][stockSign].numberToDiff;
+    var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
+
+    return "\nDiff Change "+diffNumber+" ("+diffPercentage+"%)";
+  }else{
+    return '';
   }
 }
 
@@ -93,6 +108,21 @@ function cancelStockHandler(msg, match) {
     var stockSign = match[1];
 
     cancelStockScheduling(fromId, stockSign);
+}
+
+function diffHandler(msg, match) {
+  var fromId = msg.from.id;
+  var stockSign = match[1];
+  var numberToDiff = parseFloat(match[2]);
+
+  if (schedules[fromId] && schedules[fromId][stockSign]){
+      schedules[fromId][stockSign].numberToDiff = numberToDiff;
+      bot.sendMessage(fromId, 'OK');
+      return true;
+  }else{
+    bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
+    return false;
+  }
 }
 
 function stockAndTimeHandler(msg, match) {
