@@ -45,8 +45,13 @@ function sendStockInfo(fromId, stockSign){
   request('http://finance.google.com/finance/info?client=ig&q='+stockSign, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       try{
-        var stockVal = JSON.parse(body.substring(3));
-        bot.sendMessage(fromId, JSON.stringify(stockVal[0], null, 2));
+        var stockVal = JSON.parse(body.substring(3))[0];
+        var messageBody = stockVal.t +
+            (stockVal.e)? " from \n"+stockVal.e:"\n"+
+            stockVal.lt+"\n"+
+            "Value:"+stockVal.l+"\n"+
+            "Day Change: "+stockVal.c+" "+stockVal.cp+"%";
+        bot.sendMessage(fromId, messageBody);
       }catch(e){}
     }
   });
