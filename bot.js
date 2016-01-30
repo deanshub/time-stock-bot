@@ -81,14 +81,14 @@ function stockOnlyHandler(msg, match) {
     var stockSign = match[1];
 
     sendStockInfo(fromId, stockSign);
-});
+}
 
 function cancelStockHandler(msg, match) {
     var fromId = msg.from.id;
     var stockSign = match[1];
 
     cancelStockScheduling(fromId, stockSign);
-});
+}
 
 function stockAndTimeHandler(msg, match) {
   var fromId = msg.from.id;
