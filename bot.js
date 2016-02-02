@@ -39,8 +39,10 @@ bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
 bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
 bot.onText(/\/unstock (.+)$/, cancelStockHandler);
 bot.onText(/\/stock (.+)$/, stockOnlyHandler);
+bot.onText(/\/stock$/, allStocksHandler);
 bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
 bot.onText(/\/get (.+)$/, stockOnlyHandler);
+bot.onText(/\/get$/, allStocksHandler);
 bot.onText(/\/graph (.+)$/, graphHandler);
 
 function sendStockInfo(fromId, stockSign){
@@ -85,6 +87,16 @@ function getNumberDiff(fromId, stockSign, currentValue) {
   }
 }
 
+function getStocksSignOfUser(fromId){
+  var stocks=[];
+  if (schedules[fromId]){
+    for (var stockSign in schedules[fromId]) {
+      stocks.push(stockSign);
+    }
+  }
+  return stocks;
+}
+
 function graphHandler(msg, match) {
     var fromId = msg.from.id;
     var stockSign = match[1];
@@ -95,6 +107,18 @@ function graphHandler(msg, match) {
 function helpHandler(msg, match) {
     var fromId = msg.from.id;
     bot.sendMessage(fromId, botDescription);
+}
+
+function allStocksHandler(msg) {
+  var fromId = msg.from.id;
+  var stocks = getStocksSignOfUser(fromId);
+  if (stocks.length>0){
+    stocks.forEach(function(stockSign) {
+      sendStockInfo(fromId, stockSign)
+    });
+  }else{
+    bot.sendMessage(fromId, 'sorry, you don\'t have any scheduled stocks');
+  }
 }
 
 function stockOnlyHandler(msg, match) {
