@@ -69,24 +69,26 @@ function init() {
 function reloadSchedules(fileSchedules) {
   for (var userId in fileSchedules){
     for (var stockSign in fileSchedules[userId]){
-      var sched = later.parse.text(fileSchedules[userId][stockSign].textTime);
       var t;
       if (stockSign === '*'){
+        var sched = later.parse.text(fileSchedules[userId][stockSign].textTime);
         t = later.setInterval(function(){
           allStocksHandler({from:{id:userId}});
         }, sched);
-      }else{
-        t = later.setInterval(function(){
-          sendStockInfo(userId, stockSign);
-        }, sched);
-      }
 
-      if (!schedules[userId]){
-        schedules[userId] = {};
+        if (!schedules[userId]){
+          schedules[userId] = {};
+        }
+
+        schedules[userId][stockSign] = t;
+        schedules[userId][stockSign].textTime = fileSchedules[userId][stockSign].textTime;
+        schedules[userId][stockSign].numberToDiff = fileSchedules[userId][stockSign].numberToDiff;
+      }else{
+        if (!schedules[userId]){
+          schedules[userId] = {};
+        }
+        schedules[userId][stockSign] = fileSchedules[userId][stockSign];
       }
-      schedules[userId][stockSign] = t;
-      schedules[userId][stockSign].textTime = fileSchedules[userId][stockSign].textTime;
-      schedules[userId][stockSign].numberToDiff = fileSchedules[userId][stockSign].numberToDiff;
     }
   }
 }
