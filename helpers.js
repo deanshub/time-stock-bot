@@ -18,7 +18,7 @@ function getStockBySign(stockSign) {
 }
 
 function stockToMessage(stock) {
-  var messageBody = stock.t +'    ' +stock.l+ '    ' +
+  var messageBody = stock.t +'  ' +stock.l+ '      ' +
   // (stock.e)? " from \n"+stock.e:"\n"+
   // stock.lt+'\n'+
   stock.c+' ('+stock.cp+'%)\n';
