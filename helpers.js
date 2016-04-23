@@ -27,8 +27,6 @@ function stockToMessage(stock) {
 }
 
 function writeSchedules(schedules) {
-  // numberToDiff
-  // textTime
   var schedulesNesseccery = {};
   try{
     // creating schedules file (only nesseccery properties)
@@ -37,7 +35,7 @@ function writeSchedules(schedules) {
         if (!schedulesNesseccery[userId]){
           schedulesNesseccery[userId]={};
         }
-        if (schedules[userId][stockSign] && schedules[userId][stockSign].textTime){
+        if (schedules[userId][stockSign]){
           schedulesNesseccery[userId][stockSign] = {
             textTime: schedules[userId][stockSign].textTime,
             numberToDiff: schedules[userId][stockSign].numberToDiff,
