@@ -17,10 +17,10 @@ function getStockBySign(stockSign) {
 }
 
 function stockToMessage(stock) {
-  var messageBody = stock.t + '\n' +
+  var messageBody = stock.t +'\t\t' +stock.l+ '\n' +
   // (stock.e)? " from \n"+stock.e:"\n"+
   // stock.lt+'\n'+
-  stock.l+'\t'+stock.c+' ('+stock.cp+'%)\n';
+  stock.c+' ('+stock.cp+'%)\n';
 
   return messageBody;
 }
