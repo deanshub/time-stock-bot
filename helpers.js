@@ -20,8 +20,7 @@ function stockToMessage(stock) {
   var messageBody = stock.t + '\n' +
   // (stock.e)? " from \n"+stock.e:"\n"+
   // stock.lt+'\n'+
-  'Value:'+stock.l+'\n'+
-  'Day Change: '+stock.c+' ('+stock.cp+'%)\n';
+  stock.l+'\t'+stock.c+' ('+stock.cp+'%)\n';
 
   return messageBody;
 }

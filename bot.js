@@ -85,7 +85,7 @@ function getNumberDiff(fromId, stockSign, currentValue) {
     var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
     var sign = (diffNumber<0)?'-':'+';
 
-    return 'Diff Change ' + sign + Math.abs(diffNumber.toFixed(2)) + ' (' + diffPercentage.toFixed(2) + '%)\n';
+    return 'Diff: ' + sign + Math.abs(diffNumber.toFixed(2)) + ' (' + diffPercentage.toFixed(2) + '%)\n';
   }else{
     return '';
   }
