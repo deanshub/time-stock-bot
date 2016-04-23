@@ -42,10 +42,10 @@ bot.onText(/\/help/, helpHandler);
 bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
 bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
 bot.onText(/\/unstock (.+)$/, cancelStockHandler);
-bot.onText(/\/stock (.+)$/, stockOnlyHandler);
+bot.onText(/\/stock ([^ ]+)$/, stockOnlyHandler);
 bot.onText(/\/stock$/, allStocksHandler);
 bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
-bot.onText(/\/get (.+)$/, stockOnlyHandler);
+bot.onText(/\/get ([^ ]+)$/, stockOnlyHandler);
 bot.onText(/\/get$/, allStocksHandler);
 bot.onText(/\/time (.+)$/, allStocksTimeHandler);
 bot.onText(/\/graph (.+)$/, graphHandler);
@@ -123,7 +123,7 @@ function allStocksHandler(msg) {
       return getStockMessage(fromId, stockSign);
     });
     Q.all(allMessagesPromises).then(function (allMessages) {
-      bot.sendMessage(fromId, allMessages.join());
+      bot.sendMessage(fromId, allMessages.join(''));
     }).catch(function (err) {
       console.log(err);
       bot.sendMessage(fromId, 'I seem to have a problem...');
