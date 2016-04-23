@@ -107,7 +107,7 @@ function getStockMessage(fromId, stockSign) {
 
 function sendStockInfo(fromId, stockSign){
   getStockMessage(fromId, stockSign).then(function (message) {
-    bot.sendMessage(fromId, message);
+    bot.sendMessage(fromId, message, allKeyboardOpts);
   });
 }
 
@@ -116,7 +116,7 @@ function cancelStockScheduling(fromId, stockSign){
     schedules[fromId][stockSign].clear();
     schedules[fromId][stockSign]=null;
     helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK');
+    bot.sendMessage(fromId, 'OK', allKeyboardOpts);
     return true;
   }else{
     bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
@@ -152,7 +152,7 @@ function graphHandler(msg, match) {
   var fromId = msg.from.id;
   var stockSign = match[1];
 
-  bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t=3d&q=c&l=on&z=l');
+  bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t=3d&q=c&l=on&z=l', allKeyboardOpts);
 }
 
 function helpHandler(msg) {
@@ -169,7 +169,7 @@ function allStocksHandler(msg) {
       return getStockMessage(fromId, stockSign);
     });
     Q.all(allMessagesPromises).then(function (allMessages) {
-      bot.sendMessage(fromId, allMessages.join(''));
+      bot.sendMessage(fromId, allMessages.join(''), allKeyboardOpts);
     }).catch(function (err) {
       console.log(err);
       bot.sendMessage(fromId, 'I seem to have a problem...');
@@ -194,7 +194,7 @@ function diffHandler(msg, match) {
   if (schedules[fromId] && schedules[fromId][stockSign]){
     schedules[fromId][stockSign].numberToDiff = numberToDiff;
     helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK');
+    bot.sendMessage(fromId, 'OK', allKeyboardOpts);
     return true;
   }else{
     bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
@@ -213,7 +213,7 @@ function stockAddHandler(msg, match) {
   schedules[fromId][stockSign] = new Date();
 
   helpers.writeSchedules(schedules);
-  bot.sendMessage(fromId, stockSign + ' added');
+  bot.sendMessage(fromId, stockSign + ' added', allKeyboardOpts);
 }
 
 function stockRemoveHandler(msg, match){
@@ -225,7 +225,7 @@ function stockRemoveHandler(msg, match){
   }
 
   helpers.writeSchedules(schedules);
-  bot.sendMessage(fromId, stockSign + ' removed');
+  bot.sendMessage(fromId, stockSign + ' removed', allKeyboardOpts);
 }
 
 function allStocksTimeHandler(msg, match){
@@ -253,7 +253,7 @@ function allStocksTimeHandler(msg, match){
       schedules[fromId][allStocksSign].textTime = textTime;
 
       helpers.writeSchedules(schedules);
-      bot.sendMessage(fromId, 'OK');
+      bot.sendMessage(fromId, 'OK', allKeyboardOpts);
     }
   }else{
     bot.sendMessage(fromId, 'you don\'t have any stocks, you can add some using /stock');
