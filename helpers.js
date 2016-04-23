@@ -34,13 +34,15 @@ function writeSchedules(schedules) {
     // creating schedules file (only nesseccery properties)
     for (var userId in schedules){
       for (var stockSign in schedules[userId]){
-        if (schedulesNesseccery[userId]===undefined){
+        if (!schedulesNesseccery[userId]){
           schedulesNesseccery[userId]={};
         }
-        schedulesNesseccery[userId][stockSign] = {
-          textTime: schedules[userId][stockSign].textTime,
-          numberToDiff: schedules[userId][stockSign].numberToDiff,
-        };
+        if (schedules[userId][stockSign] && schedules[userId][stockSign].textTime){
+          schedulesNesseccery[userId][stockSign] = {
+            textTime: schedules[userId][stockSign].textTime,
+            numberToDiff: schedules[userId][stockSign].numberToDiff,
+          };
+        }
       }
     }
 

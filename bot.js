@@ -101,6 +101,7 @@ function cancelStockScheduling(fromId, stockSign){
   if (schedules[fromId] && schedules[fromId][stockSign]){
     schedules[fromId][stockSign].clear();
     schedules[fromId][stockSign]=null;
+    helpers.writeSchedules(schedules);
     bot.sendMessage(fromId, 'OK');
     return true;
   }else{
@@ -229,22 +230,26 @@ function allStocksTimeHandler(msg, match){
   var stocks = getStocksSignOfUser(fromId);
 
   if (stocks.length>0){
-    var sched = later.parse.text(textTime);
-    if (!schedules[fromId]){
-      schedules[fromId]={};
-    }
-    var t = later.setInterval(function(){
-      allStocksHandler(msg);
-    }, sched);
+    if (textTime && textTime.toUpperCase()==='CANCEL'){
+      cancelStockScheduling(fromId, '*');
+    }else{
+      var sched = later.parse.text(textTime);
+      if (!schedules[fromId]){
+        schedules[fromId]={};
+      }
+      var t = later.setInterval(function(){
+        allStocksHandler(msg);
+      }, sched);
 
-    if (schedules[fromId][allStocksSign]){
-      schedules[fromId][allStocksSign].clear();
-    }
-    schedules[fromId][allStocksSign] = t;
-    schedules[fromId][allStocksSign].textTime = textTime;
+      if (schedules[fromId][allStocksSign]){
+        schedules[fromId][allStocksSign].clear();
+      }
+      schedules[fromId][allStocksSign] = t;
+      schedules[fromId][allStocksSign].textTime = textTime;
 
-    helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK');
+      helpers.writeSchedules(schedules);
+      bot.sendMessage(fromId, 'OK');
+    }
   }else{
     bot.sendMessage(fromId, 'you don\'t have any stocks, you can add some using /stock');
   }
