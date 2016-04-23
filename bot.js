@@ -54,14 +54,13 @@ function init() {
   });
 
   bot.onText(/\/help/, helpHandler);
-  bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
   bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
-  bot.onText(/\/unstock (.+)$/, cancelStockHandler);
   bot.onText(/\/stock ([^ ]+)$/, stockOnlyHandler);
   bot.onText(/\/stock$/, allStocksHandler);
-  bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
   bot.onText(/\/get ([^ ]+)$/, stockOnlyHandler);
   bot.onText(/\/get$/, allStocksHandler);
+  bot.onText(/\/add ([^ ]+)$/, stockAddHandler);
+  bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
   bot.onText(/\/graph (.+)$/, graphHandler);
 }
@@ -184,13 +183,6 @@ function stockOnlyHandler(msg, match) {
   sendStockInfo(fromId, stockSign);
 }
 
-function cancelStockHandler(msg, match) {
-  var fromId = msg.from.id;
-  var stockSign = match[1];
-
-  cancelStockScheduling(fromId, stockSign);
-}
-
 function diffHandler(msg, match) {
   var fromId = msg.from.id;
   var stockSign = match[1];
@@ -207,34 +199,30 @@ function diffHandler(msg, match) {
   }
 }
 
-function stockAndTimeHandler(msg, match) {
+function stockAddHandler(msg, match) {
   var fromId = msg.from.id;
   var stockSign = match[1];
-  var textTime = match[2];
 
-  if (textTime && textTime.toUpperCase()==='CANCEL'){
-    cancelStockScheduling(fromId, stockSign);
-  }else{
-    // helpers.addSchedule(textTime, fromId, stockSign, fn ,schedules);
-    var sched = later.parse.text(textTime);
-
-    if (!schedules[fromId]){
-      schedules[fromId]={};
-    }
-
-    var t = later.setInterval(function(){
-      sendStockInfo(fromId, stockSign);
-    }, sched);
-
-    if (schedules[fromId][stockSign]){
-      schedules[fromId][stockSign].clear();
-    }
-    schedules[fromId][stockSign] = t;
-    schedules[fromId][stockSign].textTime = textTime;
-
-    helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK');
+  if (!schedules[fromId]){
+    schedules[fromId]={};
   }
+
+  schedules[fromId][stockSign] = new Date();
+
+  helpers.writeSchedules(schedules);
+  bot.sendMessage(fromId, stockSign + ' added');
+}
+
+function stockRemoveHandler(msg, match){
+  var fromId = msg.from.id;
+  var stockSign = match[1];
+
+  if (schedules[fromId] && schedules[fromId][stockSign]){
+    schedules[fromId][stockSign] = undefined;
+  }
+
+  helpers.writeSchedules(schedules);
+  bot.sendMessage(fromId, stockSign + ' removed');
 }
 
 function allStocksTimeHandler(msg, match){
