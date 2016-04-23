@@ -17,8 +17,8 @@ var options = {
 
 var bot = new TelegramBot(token, options);
 bot.setWebHook('stock.shubapp.com:443/bot'+token,__dirname+'/crt.pem');
-
 var schedules={};
+
 
 var botDescription='Hi, I\'m TimeStockBot\n'+
     'This is what I can do:\n'+
@@ -38,17 +38,47 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/unstock fb\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
 
-bot.onText(/\/help/, helpHandler);
-bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
-bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
-bot.onText(/\/unstock (.+)$/, cancelStockHandler);
-bot.onText(/\/stock ([^ ]+)$/, stockOnlyHandler);
-bot.onText(/\/stock$/, allStocksHandler);
-bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
-bot.onText(/\/get ([^ ]+)$/, stockOnlyHandler);
-bot.onText(/\/get$/, allStocksHandler);
-bot.onText(/\/time (.+)$/, allStocksTimeHandler);
-bot.onText(/\/graph (.+)$/, graphHandler);
+function init() {
+  helpers.getSchedulesFromFile().then(function (schedulesFromFile) {
+    reloadSchedules(schedulesFromFile);
+  });
+
+  bot.onText(/\/help/, helpHandler);
+  bot.onText(/\/stock ([^ ]+) (.+)$/, stockAndTimeHandler);
+  bot.onText(/\/diff ([^ ]+) ([+-]?\d+(\.\d+)?)$/, diffHandler);
+  bot.onText(/\/unstock (.+)$/, cancelStockHandler);
+  bot.onText(/\/stock ([^ ]+)$/, stockOnlyHandler);
+  bot.onText(/\/stock$/, allStocksHandler);
+  bot.onText(/\/get ([^ ]+) (.+)$/, stockAndTimeHandler);
+  bot.onText(/\/get ([^ ]+)$/, stockOnlyHandler);
+  bot.onText(/\/get$/, allStocksHandler);
+  bot.onText(/\/time (.+)$/, allStocksTimeHandler);
+  bot.onText(/\/graph (.+)$/, graphHandler);
+}
+
+
+function reloadSchedules(fileSchedules) {
+  for (var userId in fileSchedules){
+    for (var stockSign in fileSchedules[userId]){
+      var sched = later.parse.text(fileSchedules[userId][stockSign].textTime);
+      var t;
+      if (stockSign === '*'){
+        t = later.setInterval(function(){
+          allStocksHandler({from:{id:userId}});
+        }, sched);
+      }else{
+        t = later.setInterval(function(){
+          sendStockInfo(userId, stockSign);
+        }, sched);
+      }
+      schedules[userId][stockSign] = t;
+      schedules[userId][stockSign].textTime = fileSchedules[userId][stockSign].textTime;
+      schedules[userId][stockSign].numberToDiff = fileSchedules[userId][stockSign].numberToDiff;
+    }
+  }
+}
+
+
 
 function getStockMessage(fromId, stockSign) {
   return helpers.getStockBySign(stockSign).then(function (stock) {
@@ -170,6 +200,7 @@ function stockAndTimeHandler(msg, match) {
   if (textTime && textTime.toUpperCase()==='CANCEL'){
     cancelStockScheduling(fromId, stockSign);
   }else{
+    // helpers.addSchedule(textTime, fromId, stockSign, fn ,schedules);
     var sched = later.parse.text(textTime);
 
     if (!schedules[fromId]){
@@ -184,7 +215,9 @@ function stockAndTimeHandler(msg, match) {
       schedules[fromId][stockSign].clear();
     }
     schedules[fromId][stockSign] = t;
+    schedules[fromId][stockSign].textTime = textTime;
 
+    helpers.writeSchedules(schedules);
     bot.sendMessage(fromId, 'OK');
   }
 }
@@ -208,8 +241,13 @@ function allStocksTimeHandler(msg, match){
       schedules[fromId][allStocksSign].clear();
     }
     schedules[fromId][allStocksSign] = t;
+    schedules[fromId][allStocksSign].textTime = textTime;
+
+    helpers.writeSchedules(schedules);
     bot.sendMessage(fromId, 'OK');
   }else{
     bot.sendMessage(fromId, 'you don\'t have any stocks, you can add some using /stock');
   }
 }
+
+init();

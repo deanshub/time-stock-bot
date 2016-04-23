@@ -1,5 +1,6 @@
 var request = require('request');
 var Q = require('q');
+var fs = require('fs');
 
 var googleFinanaceApiUrl = 'http://finance.google.com/finance/info?client=ig&q=';
 
@@ -17,7 +18,7 @@ function getStockBySign(stockSign) {
 }
 
 function stockToMessage(stock) {
-  var messageBody = stock.t +'\t\t' +stock.l+ '\n' +
+  var messageBody = stock.t +'\t\t\t\t' +stock.l+ '\n' +
   // (stock.e)? " from \n"+stock.e:"\n"+
   // stock.lt+'\n'+
   stock.c+' ('+stock.cp+'%)\n';
@@ -25,8 +26,49 @@ function stockToMessage(stock) {
   return messageBody;
 }
 
+function writeSchedules(schedules) {
+  // numberToDiff
+  // textTime
+  var schedulesNesseccery = {};
+  try{
+    // creating schedules file (only nesseccery properties)
+    for (var userId in schedules){
+      for (var stockSign in schedules[userId]){
+        if (schedulesNesseccery[userId]===undefined){
+          schedulesNesseccery[userId]={};
+        }
+        schedulesNesseccery[userId][stockSign] = {
+          textTime: schedules[userId][stockSign].textTime,
+          numberToDiff: schedules[userId][stockSign].numberToDiff,
+        };
+      }
+    }
+
+    var schedulesString = JSON.stringify(schedulesNesseccery);
+    fs.writeFile('schedules.json',schedulesString,function (err) {
+      if(err)console.log(err);
+    });
+  }catch(e){
+    console.log(e);
+  }
+}
+
+function getSchedulesFromFile() {
+  return Q.promise(function (resolve, reject) {
+    fs.readFile('schedules.json',function (err, schedules) {
+      if (err) {
+        console.log(err);
+        reject(err);
+      }else{
+        resolve(schedules);
+      }
+    });
+  });
+}
 
 module.exports = {
   getStockBySign: getStockBySign,
   stockToMessage: stockToMessage,
+  writeSchedules: writeSchedules,
+  getSchedulesFromFile: getSchedulesFromFile,
 };
