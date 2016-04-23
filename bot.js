@@ -38,6 +38,15 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/unstock fb\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
 
+var allKeyboardOpts ={
+  reply_markup:JSON.stringify({
+    keyboard:[
+      ['/get'],
+      ['/help'],
+    ],
+  }),
+};
+
 function init() {
   helpers.getSchedulesFromFile().then(function (schedulesFromFile) {
     reloadSchedules(schedulesFromFile);
@@ -143,10 +152,9 @@ function graphHandler(msg, match) {
   bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t=3d&q=c&l=on&z=l');
 }
 
-// function helpHandler(msg, match) {
 function helpHandler(msg) {
   var fromId = msg.from.id;
-  bot.sendMessage(fromId, botDescription);
+  bot.sendMessage(fromId, botDescription, allKeyboardOpts);
 }
 
 function allStocksHandler(msg) {
