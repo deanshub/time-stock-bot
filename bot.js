@@ -23,19 +23,18 @@ var schedules={};
 var botDescription='Hi, I\'m TimeStockBot\n'+
     'This is what I can do:\n'+
     '/help to get this message\n'+
+    '/stock - get full report on all added stocks\n'+
     '/stock <STOCK_SIGN> - current stock values\n'+
-    '/stock <STOCK_SIGN> <TIME> - stock values at a certain time\n'+
-    '/stock <STOCK_SIGN> cancel - stop stock scheduling\n'+
     '/time <TIME> - send a full stocks report at a certain time\n'+
     '/time cancel - stop automatic message of full stocks report\n'+
     '/graph <STOCK_SIGN> - stock 3 day graph\n'+
     '/get - same as /stock\n'+
-    '/unstock <STOCK_SIGN> - same as /stock <STOCK_SIGN> cancel\n'+
     '/diff <STOCK_SIGN> <NUMBER> - scheduled stocks will also show ratio to this number\n'+
     '\nExamples:\n'+
     '/stock fb\n'+
-    '/stock fb every day at 10:00\n'+
-    '/unstock fb\n'+
+    '/add fb\n'+
+    '/add aapl\n'+
+    '/time at 10:00\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
 
 var allKeyboardOpts ={
@@ -141,7 +140,9 @@ function getStocksSignOfUser(fromId){
   var stocks=[];
   if (schedules[fromId]){
     for (var stockSign in schedules[fromId]) {
-      stocks.push(stockSign);
+      if (stockSign!=='*'){
+        stocks.push(stockSign);
+      }
     }
   }
   return stocks;
