@@ -189,6 +189,7 @@ function diffHandler(msg, match) {
 
   if (schedules[fromId] && schedules[fromId][stockSign]){
     schedules[fromId][stockSign].numberToDiff = numberToDiff;
+    helpers.writeSchedules(schedules);
     bot.sendMessage(fromId, 'OK');
     return true;
   }else{
