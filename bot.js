@@ -71,6 +71,10 @@ function reloadSchedules(fileSchedules) {
           sendStockInfo(userId, stockSign);
         }, sched);
       }
+
+      if (!schedules[userId]){
+        schedules[userId] = {};
+      }
       schedules[userId][stockSign] = t;
       schedules[userId][stockSign].textTime = fileSchedules[userId][stockSign].textTime;
       schedules[userId][stockSign].numberToDiff = fileSchedules[userId][stockSign].numberToDiff;
