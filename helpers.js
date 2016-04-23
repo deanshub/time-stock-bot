@@ -57,7 +57,7 @@ function writeSchedules(schedules) {
 
 function getSchedulesFromFile() {
   return Q.promise(function (resolve, reject) {
-    fs.readFile('schedules.json',function (err, schedules) {
+    fs.readFile('schedules.json','utf8',function (err, schedules) {
       if (err) {
         console.log(err);
         reject(err);
