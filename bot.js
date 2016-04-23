@@ -42,7 +42,6 @@ var allKeyboardOpts ={
   reply_markup:JSON.stringify({
     keyboard:[
       ['/get'],
-      ['/help'],
     ],
   }),
 };
