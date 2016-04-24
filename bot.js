@@ -28,6 +28,8 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/stock - get full report on all added stocks\n'+
     '/stock <STOCK_SIGN> - current stock values\n'+
     '/get - alias for /stock\n'+
+    '/add <STOCK_SIGN> - add stock to full stocks report\n'+
+    '/remove <STOCK_SIGN> - remove stock from full stocks report\n'+
     '/time <TIME> - send a full stocks report at a certain time\n'+
     '/time cancel - stop automatic message of full stocks report\n'+
     '/graph <STOCK_SIGN> - stock 3 day graph\n'+
