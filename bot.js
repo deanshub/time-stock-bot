@@ -32,8 +32,8 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/time cancel - stop automatic message of full stocks report\n'+
     '/graph <STOCK_SIGN> - stock 3 day graph\n'+
     '/diff <STOCK_SIGN> <NUMBER> - added stocks will also show ratio to this number\n'+
-    '/predict <DAYS_OR_MONTHS> <TIME_BACK> <PERCENT> <INTERVAL> - shows prediction when to buy the stock,\n'+
-    '         DAYS_OR_MONTHS = 1|0 TIME_BACK=number PERCENT=float INTERVAL=number+(m|h|D)\n'+
+    '/predict <DAYS_OR_MONTHS> <TIME_BACK> <PERCENT> <INTERVAL> <TIME_FRAME> - shows prediction when to buy the stock,\n'+
+    '         DAYS_OR_MONTHS = 1|0 TIME_BACK=number PERCENT=float INTERVAL=number TIME_FRAME=m|h|D\n'+
     '/predict - if the previous defined then sends prediction immidiatly\n'+
     '/help - to get this message\n'+
     '\nExamples:\n'+
@@ -41,6 +41,7 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/add fb\n'+
     '/add aapl\n'+
     '/time at 10:00\n'+
+    '/predict 1 7 5 1h\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
 
 var allKeyboardOpts ={
@@ -68,7 +69,7 @@ function init() {
   bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
   bot.onText(/\/graph (.+)$/, graphHandler);
-  bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+[mhD])$/, predictionHandler);
+  bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
 }
 
@@ -299,8 +300,9 @@ function predictionHandler(msg, match) {
   var timeBack = match[2];
   var percentRatio = match[3];
   var interval = match[5];
+  var timeFrame = match[6];
 
-  var sched = later.parse.text('every ' + interval);
+  var sched = later.parse.text('every ' + interval + ' ' + timeFrame);
 
   var t = later.setInterval(function(){
     sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
@@ -312,7 +314,7 @@ function predictionHandler(msg, match) {
   }
 
   schedules[fromId][PREDICTION_SIGN] = t;
-  schedules[fromId][PREDICTION_SIGN].textTime = 'every ' + interval;
+  schedules[fromId][PREDICTION_SIGN].textTime = 'every ' + interval + ' ' + timeFrame;
   schedules[fromId][PREDICTION_SIGN].daysOrMonths = daysOrMonths;
   schedules[fromId][PREDICTION_SIGN].timeBack = timeBack;
   schedules[fromId][PREDICTION_SIGN].percentRatio = percentRatio;
