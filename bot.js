@@ -41,7 +41,7 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/add fb\n'+
     '/add aapl\n'+
     '/time at 10:00\n'+
-    '/predict 1 7 5 1h\n'+
+    '/predict 1 7 5 1 h\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
 
 var allKeyboardOpts ={
@@ -290,7 +290,9 @@ function allStocksTimeHandler(msg, match){
 function sendPredictions(fromId, daysOrMonths, timeBack, percentRatio) {
   var stocks = getStocksSignOfUser(fromId);
   smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
-    bot.sendMessage(fromId, predictions.join('\n'));
+    if (predictions && predictions.length>0){
+      bot.sendMessage(fromId, predictions.join('\n'));
+    }
   });
 }
 
@@ -330,7 +332,15 @@ function predictNowHandler(msg){
     var daysOrMonths = schedules[fromId][PREDICTION_SIGN].daysOrMonths;
     var timeBack = schedules[fromId][PREDICTION_SIGN].timeBack;
     var percentRatio = schedules[fromId][PREDICTION_SIGN].percentRatio;
-    sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
+
+    var stocks = getStocksSignOfUser(fromId);
+    smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
+      if (predictions && predictions.length>0){
+        bot.sendMessage(fromId, predictions.join('\n'));
+      }else{
+        bot.sendMessage(fromId, 'no predictions found for the specified settings\n');
+      }
+    });
   }else {
     bot.sendMessage(fromId, 'you have not defined your prediction settings yet');
   }
