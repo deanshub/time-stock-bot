@@ -39,6 +39,9 @@ function writeSchedules(schedules) {
           schedulesNesseccery[userId][stockSign] = {
             textTime: schedules[userId][stockSign].textTime,
             numberToDiff: schedules[userId][stockSign].numberToDiff,
+            daysOrMonths: schedules[userId][stockSign].daysOrMonths,
+            timeBack: schedules[userId][stockSign].timeBack,
+            percentRatio: schedules[userId][stockSign].percentRatio,
           };
         }
       }

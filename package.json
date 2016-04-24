@@ -22,6 +22,7 @@
     "later": "^1.2.0",
     "node-telegram-bot-api": "^0.19.2",
     "q": "^1.4.1",
+    "regression": "^1.2.1",
     "request": "^2.69.0"
   },
   "devDependencies": {
