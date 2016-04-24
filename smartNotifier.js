@@ -134,7 +134,7 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   }
   return checkIfShouldBy(stocks, startDate, ratio).then(function (winningStocks) {
     return winningStocks.map(function (stock) {
-      return stock.stockSign + '\n prediction: '+stock.prediction + '  current:' +
+      return stock.stockSign + '\n prediction: '+stock.prediction.toFixed(2) + '  current:' +
       stock.askingPrice + ' ('+stock.diffPercentage.toFixed(2)+'%)';
     });
   });
