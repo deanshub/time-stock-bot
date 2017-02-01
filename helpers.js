@@ -30,7 +30,7 @@ function getStockBySign(stockSign) {
 function stockToMessage(stock) {
   var stockValues = stock.query.results.row;
 
-  var messageBody = stockValues.symbol.toUpperCase() +'  ' +stringToNumber(stockValues.low).toFixed(2)+ '      ' +
+  var messageBody = fill(stockValues.symbol.toUpperCase() +'  ' +stringToNumber(stockValues.low).toFixed(2)) +
   stringToNumber(stockValues.change).toFixed(2)+' ('+stringToNumber(stockValues.pchange).toFixed(2)+'%)\n';
   // realtime is in stockValues.rchange and stockValues.rpchange
 
@@ -91,9 +91,15 @@ function stringToNumber(value){
   return returnValue;
 }
 
+var SPACES = '                        ';
+function fill(text){
+  return (text+SPACES).slice(0, SPACES.length);
+}
+
 module.exports = {
   getStockBySign: getStockBySign,
   stockToMessage: stockToMessage,
   writeSchedules: writeSchedules,
   getSchedulesFromFile: getSchedulesFromFile,
+  fill: fill,
 };

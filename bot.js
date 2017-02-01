@@ -31,6 +31,8 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/time <TIME> - send a full stocks report at a certain time\n'+
     '/time cancel - stop automatic message of full stocks report\n'+
     '/graph <STOCK_SIGN> - stock 3 day graph\n'+
+    '/graph <STOCK_SIGN> <PERIOD_AMOUNT><PERIDO_SIGN> - stock graph by time period\n'+
+    '                  PERIOD_AMOUNT = number  PERIDO_SIGN = d|m|y\n'+
     '/diff <STOCK_SIGN> <NUMBER> - added stocks will also show ratio to this number\n'+
     '/predict <DAYS_OR_MONTHS> <TIME_BACK> <PERCENT> <INTERVAL> <TIME_FRAME> - shows prediction when to buy the stock,\n'+
     '         DAYS_OR_MONTHS = 1|0 TIME_BACK=number PERCENT=float INTERVAL=number TIME_FRAME=m|h|D\n'+
@@ -40,6 +42,7 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/stock fb\n'+
     '/add fb\n'+
     '/add aapl\n'+
+    '/graph wix 1y\n'+
     '/time at 10:00\n'+
     '/predict 1 7 5 1 h\n'+
     'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
@@ -68,7 +71,7 @@ function init() {
   bot.onText(/\/add ([^ ]+)$/, stockAddHandler);
   bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
-  bot.onText(/\/graph (.+)$/, graphHandler);
+  bot.onText(/\/graph ([^ ]+) ?(\d*)([dym])?$/, graphHandler);
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
 }
@@ -166,7 +169,7 @@ function getNumberDiff(fromId, stockSign, currentValue) {
     var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
     var sign = (diffNumber<0)?'-':'+';
 
-    return 'Diff:                  ' + sign + Math.abs(diffNumber.toFixed(2)) + ' (' + diffPercentage.toFixed(2) + '%)\n';
+    return helpers.fill(' Diff:') + sign + Math.abs(diffNumber.toFixed(2)) + ' (' + diffPercentage.toFixed(2) + '%)\n';
   }else{
     return '';
   }
@@ -187,8 +190,12 @@ function getStocksSignOfUser(fromId){
 function graphHandler(msg, match) {
   var fromId = msg.from.id;
   var stockSign = match[1];
+  var amountPeriod = match[2];
+  amountPeriod = amountPeriod===''?3:parseInt(amountPeriod);
+  var timePeriod = match[3]||'d';
 
-  bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t=3d&q=c&l=on&z=l', allKeyboardOpts);
+  bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t='+
+    amountPeriod+timePeriod+'&q=c&l=on&z=l', allKeyboardOpts);
 }
 
 function helpHandler(msg) {
