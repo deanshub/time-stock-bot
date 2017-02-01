@@ -1,1 +1,4 @@
 node_modules/
+post-receive
+*.pem
+*.lock

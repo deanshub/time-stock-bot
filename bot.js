@@ -15,13 +15,11 @@ var options = {
     key: __dirname+'/key.pem',
     cert: __dirname+'/crt.pem',
   },
-//   polling: true,
 };
 
 var bot = new TelegramBot(token, options);
-bot.setWebHook('stock.shubapp.com:443/bot'+token,__dirname+'/crt.pem');
+bot.setWebHook('stock.shubapp.com:443/bot'+token, __dirname+'/crt.pem');
 var schedules={};
-
 
 var botDescription='Hi, I\'m TimeStockBot\n'+
     'This is what I can do:\n'+
@@ -127,7 +125,8 @@ function reloadSchedules(fileSchedules) {
 function getStockMessage(fromId, stockSign) {
   return helpers.getStockBySign(stockSign).then(function (stock) {
     var message = helpers.stockToMessage(stock);
-    message+=getNumberDiff(fromId, stockSign, parseFloat(stock.l));
+    var stockValues = stock.query.results.row;
+    message+=getNumberDiff(fromId, stockSign, parseFloat(stockValues.low));
     return message;
   }).catch(function (err) {
     console.log(err);
@@ -309,7 +308,9 @@ function predictionHandler(msg, match) {
   var sched = later.parse.text('every ' + interval + ' ' + timeFrame);
 
   var t = later.setInterval(function(){
-    sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
+    (function(fromId, daysOrMonths, timeBack, percentRatio){
+      sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
+    })();
   }, sched);
 
   if (schedules[fromId][PREDICTION_SIGN]){
