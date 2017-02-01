@@ -81,9 +81,12 @@ function reloadSchedules(fileSchedules) {
       var sched;
       if (stockSign === ALL_STOCKS_SIGN ){
         sched = later.parse.text(fileSchedules[userId][stockSign].textTime);
-        t = later.setInterval(function(){
-          allStocksHandler({from:{id:userId}});
-        }, sched);
+
+        (function (userId) {
+          t = later.setInterval(function(){
+            allStocksHandler({from:{id:userId}});
+          }, sched);
+        })(userId);
 
         if (!schedules[userId]){
           schedules[userId] = {};
@@ -99,9 +102,13 @@ function reloadSchedules(fileSchedules) {
         var percentRatio = fileSchedules[userId][stockSign].percentRatio;
 
         sched = later.parse.text(textTime);
-        t = later.setInterval(function(){
-          sendPredictions(userId, daysOrMonths, timeBack, percentRatio);
-        }, sched);
+
+        (function (userId, daysOrMonths, timeBack, percentRatio) {
+          t = later.setInterval(function(){
+            sendPredictions(userId, daysOrMonths, timeBack, percentRatio);
+          }, sched);
+        })(userId, daysOrMonths, timeBack, percentRatio);
+
         if (!schedules[userId]){
           schedules[userId] = {};
         }
@@ -270,9 +277,13 @@ function allStocksTimeHandler(msg, match){
       if (!schedules[fromId]){
         schedules[fromId]={};
       }
-      var t = later.setInterval(function(){
-        allStocksHandler(msg);
-      }, sched);
+
+      var t;
+      (function (msg) {
+        t = later.setInterval(function(){
+          allStocksHandler(msg);
+        }, sched);
+      })(msg);
 
       if (schedules[fromId][ALL_STOCKS_SIGN]){
         schedules[fromId][ALL_STOCKS_SIGN].clear();
@@ -307,11 +318,12 @@ function predictionHandler(msg, match) {
 
   var sched = later.parse.text('every ' + interval + ' ' + timeFrame);
 
-  var t = later.setInterval(function(){
-    (function(fromId, daysOrMonths, timeBack, percentRatio){
+  var t;
+  (function (fromId, daysOrMonths, timeBack, percentRatio) {
+    t = later.setInterval(function(){
       sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
-    })();
-  }, sched);
+    }, sched);
+  })(fromId, daysOrMonths, timeBack, percentRatio);
 
   if (schedules[fromId][PREDICTION_SIGN]){
     schedules[fromId][PREDICTION_SIGN].clear();

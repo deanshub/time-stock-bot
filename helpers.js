@@ -29,8 +29,9 @@ function getStockBySign(stockSign) {
 
 function stockToMessage(stock) {
   var stockValues = stock.query.results.row;
-  var messageBody = stockValues.symbol +'  ' +stockValues.low+ '      ' +
-  stockValues.change+' ('+stockValues.pchange+')\n';
+
+  var messageBody = stockValues.symbol.toUpperCase() +'  ' +stringToNumber(stockValues.low).toFixed(2)+ '      ' +
+  stringToNumber(stockValues.change).toFixed(2)+' ('+stringToNumber(stockValues.pchange).toFixed(2)+'%)\n';
   // realtime is in stockValues.rchange and stockValues.rpchange
 
   return messageBody;
@@ -78,6 +79,16 @@ function getSchedulesFromFile() {
       }
     });
   });
+}
+
+function stringToNumber(value){
+  var returnValue = NaN;
+  try {
+    returnValue = parseFloat(value.replace('%',''));
+  } catch (e) {
+    console.error(e);
+  }
+  return returnValue;
 }
 
 module.exports = {
