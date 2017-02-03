@@ -133,10 +133,10 @@ function reloadSchedules(fileSchedules) {
 
 
 function getStockMessage(fromId, stockSign) {
-  return helpers.getStockBySign(stockSign).then(function (stock) {
-    var message = helpers.stockToMessage(stock);
-    var stockValues = stock.query.results.row;
-    message+=getNumberDiff(fromId, stockSign, parseFloat(stockValues.low));
+  return helpers.getStockBySign(stockSign).then(function (stockValues) {
+    var message = helpers.stockToMessage(stockValues);
+
+    message+=getNumberDiff(fromId, stockSign, stockValues.currentValue);
     return message;
   }).catch(function (err) {
     console.log(err);
