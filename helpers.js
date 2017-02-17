@@ -68,9 +68,22 @@ function getStockBySign(stockSign, yahoo) {
   });
 }
 
+function numberWithSign(value) {
+  var parsedValue = 0;
+  var sign='+';
+  if (value!==undefined && value!==null){
+    parsedValue = value;
+  }
+  if (parsedValue<0){
+    sign = '-';
+  }
+
+  return sign + parsedValue.toFixed(2).replace(/[+-]/,'').trim();
+}
+
 function stockToMessage(stockValues) {
   var messageBody = fill(stockValues.symbol.toUpperCase() +'  ' +stockValues.currentValue.toFixed(2)) +
-  (stockValues.change||0).toFixed(2)+' ('+(stockValues.pchange||0).toFixed(2)+'%)\n';
+  numberWithSign(stockValues.change)+' ('+numberWithSign(stockValues.pchange)+'%)\n';
   // realtime is in stockValues.rchange and stockValues.rpchange
 
   return messageBody;
@@ -144,4 +157,5 @@ module.exports = {
   writeSchedules: writeSchedules,
   getSchedulesFromFile: getSchedulesFromFile,
   fill: fill,
+  numberWithSign: numberWithSign,
 };

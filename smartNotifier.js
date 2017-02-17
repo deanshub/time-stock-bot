@@ -3,30 +3,43 @@ var Q = require('q');
 var regression = require('regression');
 
 var yahooapiPrefix = 'http://query.yahooapis.com/v1/public/yql?q=';
-var yahooapiPostfix = '&format=json&env=http://datatables.org/alltables.env';
+var yahooapiPostfix = '&format=json&env=store://datatables.org/alltableswithkeys';
+
+function bestAskFor(stock){
+  ['AskRealtime','Ask','LastTradePriceOnly','Open','PreviousClose'].forEach(function (prop) {
+    try {
+      var bestAskVal = parseFloat(stock[prop]);
+      if (!isNaN(bestAskVal)){
+        stock.bestAskVal = bestAskVal;
+        stock.bestAskProp = prop;
+        return stock;
+      }
+    } catch (e) {}
+  });
+  return stock;
+}
 
 function getCurrentDataOfStocks(stocks) {
-  var query = 'SELECT Symbol,LastTradePriceOnly,Ask FROM yahoo.finance.quotes WHERE symbol IN ("' + stocks.join('","') +'")';
+  var query = 'SELECT * FROM yahoo.finance.quotes WHERE symbol IN ("' + stocks.join('","').toUpperCase() +'")';
   return Q.promise(function (resolve, reject) {
     request(yahooapiPrefix+query+yahooapiPostfix, function (error, response, body) {
       if (error || response.statusCode !== 200) {
         return reject(error);
       }else{
         var processedStocks = {};
-        var yahooResult = JSON.parse(body);
-        if (Array.isArray(yahooResult.query.results.quote)){
-          yahooResult.query.results.quote.forEach(function (stock) {
-            processedStocks[stock.Symbol] = {
-              LastTradePriceOnly: parseFloat(stock.LastTradePriceOnly),
-              Ask: parseFloat(stock.Ask),
-            };
+        var yahooResult;
+        try {
+          yahooResult = JSON.parse(body).query.results.quote;
+        } catch (e) {
+          reject(body);
+        }
+        if (Array.isArray(yahooResult)){
+          yahooResult.forEach(function (stock) {
+            processedStocks[stock.Symbol] = bestAskFor(stock);
           });
         }else{
-          var stock = yahooResult.query.results.quote;
-          processedStocks[stock.Symbol] = {
-            LastTradePriceOnly: parseFloat(stock.LastTradePriceOnly),
-            Ask: parseFloat(stock.Ask),
-          };
+          var stock = yahooResult;
+          processedStocks[stock.Symbol] = bestAskFor(stock);
         }
         resolve(processedStocks);
       }
@@ -55,9 +68,14 @@ function getHistoricDataOfStocks(stocks, startDate, endDate) {
         return reject(error);
       }else{
         var processedStocks = {};
-        var yahooResult = JSON.parse(body);
-        if (yahooResult.query.results){
-          yahooResult.query.results.quote.forEach(function (stock) {
+        var yahooResult;
+        try {
+          yahooResult = JSON.parse(body).query.results.quote;
+        } catch (e) {
+          reject(body);
+        }
+        if (yahooResult){
+          yahooResult.forEach(function (stock) {
             if (!processedStocks[stock.Symbol]){
               processedStocks[stock.Symbol] = [];
             }
@@ -85,7 +103,7 @@ function getHistoricDataOfStocks(stocks, startDate, endDate) {
 // var endDate = new Date();
 // getHistoricDataOfStocks(['FB','AAPL'], startDate, endDate).then(console.log);
 
-function checkIfShouldBy(stocks, startDate, ratio) {
+function checkIfShouldBuy(stocks, startDate, ratio) {
   var winningStocks = [];
   return Q.all([getCurrentDataOfStocks(stocks), getHistoricDataOfStocks(stocks, startDate, new Date())])
   .then(function (results) {
@@ -96,28 +114,31 @@ function checkIfShouldBy(stocks, startDate, ratio) {
     // if currentStockVals[stock] - ratio < linear regression prediction to this date
     // return that should buy
     for (var stockSign in currentStockVals){
-      var data = historicStockVals[stockSign].map(function (stockVal, index) {
-        // can also be Close
-        return [index, stockVal.Adj_Close];
-      });
+      if (currentStockVals[stockSign].bestAskVal!==undefined && historicStockVals[stockSign]!==undefined){
+        var data = historicStockVals[stockSign].map(function (stockVal, index) {
+          // can also be Close
+          return [index, stockVal.Adj_Close];
+        });
 
-      // lose the last trade
-      data.pop();
+        // lose the last trade
+        data.pop();
 
-      var equation = regression('linear', data).equation;
-      var gradient = equation[0];
-      var yIntercept = equation[1];
-      if(gradient>0){
-        var prediction = data.length * gradient + yIntercept;
-        // can also be LastTradePriceOnly
-        var diffPercentage = (prediction - currentStockVals[stockSign].Ask)/currentStockVals[stockSign].Ask*100;
-        if (diffPercentage > ratio){
-          winningStocks.push({
-            stockSign: stockSign,
-            prediction: prediction,
-            askingPrice: currentStockVals[stockSign].Ask,
-            diffPercentage: diffPercentage,
-          });
+        var equation = regression('linear', data).equation;
+        var gradient = equation[0];
+        var yIntercept = equation[1];
+        if(gradient>0){
+          var prediction = data.length * gradient + yIntercept;
+          // can also be LastTradePriceOnly
+          var diffPercentage = (prediction - currentStockVals[stockSign].bestAskVal)/currentStockVals[stockSign].bestAskVal*100;
+          if (diffPercentage > ratio){
+            winningStocks.push({
+              stockSign: stockSign,
+              prediction: prediction,
+              askingPrice: currentStockVals[stockSign].bestAskVal,
+              askingPriceProp: currentStockVals[stockSign].bestAskProp,
+              diffPercentage: diffPercentage,
+            });
+          }
         }
       }
     }
@@ -132,10 +153,10 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   }else {
     startDate.setMonth(startDate.getMonth()-numberBack);
   }
-  return checkIfShouldBy(stocks, startDate, ratio).then(function (winningStocks) {
+  return checkIfShouldBuy(stocks, startDate, ratio).then(function (winningStocks) {
     return winningStocks.map(function (stock) {
       return stock.stockSign + '\n prediction: '+stock.prediction.toFixed(2) + '  current:' +
-      stock.askingPrice + ' ('+stock.diffPercentage.toFixed(2)+'%)';
+      stock.askingPrice + 'by ' + stock.askingPriceProp +' ('+stock.diffPercentage.toFixed(2)+'%)';
     });
   });
 }

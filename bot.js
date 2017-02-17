@@ -167,9 +167,8 @@ function getNumberDiff(fromId, stockSign, currentValue) {
   if (schedules[fromId] && schedules[fromId][stockSign] && (schedules[fromId][stockSign].numberToDiff!==undefined)){
     var diffNumber = currentValue - schedules[fromId][stockSign].numberToDiff;
     var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
-    var sign = (diffNumber<0)?'-':'+';
 
-    return helpers.fill(' Diff:') + sign + Math.abs(diffNumber.toFixed(2)) + ' (' + diffPercentage.toFixed(2) + '%)\n';
+    return helpers.fill(' Diff:') + helpers.numberWithSign(diffNumber) + ' (' + helpers.numberWithSign(diffPercentage)+ '%)\n';
   }else{
     return '';
   }
