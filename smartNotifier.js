@@ -61,7 +61,7 @@ function getHistoricDataOfStocks(stocks, startDate, endDate) {
   return Q.promise(function (resolve, reject) {
     var startDateString = dateToString(startDate);
     var endDateString = dateToString(endDate);
-    var query ='SELECT Symbol,Date,Close,Adj_Close FROM yahoo.finance.historicaldata WHERE symbol IN ("'+stocks.join('","')+'") '+
+    var query ='SELECT Symbol,Date,Close,Adj_Close FROM yahoo.finance.historicaldata WHERE symbol IN ("'+stocks.join('","').toUpperCase()+'") '+
       'AND startDate = "'+startDateString+'" AND endDate = "'+endDateString+'"';
     request(yahooapiPrefix+query+yahooapiPostfix, function (error, response, body) {
       if (error || response.statusCode !== 200) {
