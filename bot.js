@@ -74,6 +74,7 @@ function init() {
   bot.onText(/\/graph ([^ ]+) ?(\d*)([dym])?$/, graphHandler);
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
+  bot.onText(/^\/info ([^ ]+)$/, infoHandler);
 }
 
 
@@ -305,11 +306,23 @@ function allStocksTimeHandler(msg, match){
   }
 }
 
+function stocksAlreadyAlerted(stock){
+  if (stock.lastAlerted && ((new Date()).toDateString() !== stock.lastAlerted.toDateString())){
+    return true;
+  }
+  return false;
+}
+
 function sendPredictions(fromId, daysOrMonths, timeBack, percentRatio) {
-  var stocks = getStocksSignOfUser(fromId);
+  var stocks = getStocksSignOfUser(fromId).filter(stocksAlreadyAlerted);
   smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
     if (predictions && predictions.length>0){
-      bot.sendMessage(fromId, predictions.join('\n'));
+      var predictionMessage = predictions.map(function (prediction) {
+        schedules[fromId][prediction.stockSign].lastAlerted = new Date();
+        return prediction.message;
+      }).join('\n');
+
+      bot.sendMessage(fromId, predictionMessage);
     }
   });
 }
@@ -357,7 +370,10 @@ function predictNowHandler(msg){
     var stocks = getStocksSignOfUser(fromId);
     smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
       if (predictions && predictions.length>0){
-        bot.sendMessage(fromId, predictions.join('\n'));
+        var predictionMessage = predictions.map(function (prediction) {
+          return prediction.message;
+        }).join('\n');
+        bot.sendMessage(fromId, predictionMessage);
       }else{
         bot.sendMessage(fromId, 'no predictions found for the specified settings\n');
       }
@@ -365,6 +381,17 @@ function predictNowHandler(msg){
   }else {
     bot.sendMessage(fromId, 'you have not defined your prediction settings yet');
   }
+}
+
+function infoHandler(msg, match) {
+  var fromId = msg.from.id;
+  var stockSign = match[1];
+  smartNotifier.getPredictionInfo(stockSign).then(function (stockInfo) {
+    bot.sendMessage(fromId, stockInfo);
+  }).catch(function (err) {
+    console.log(err);
+    bot.sendMessage(fromId, 'I got a problem when I tried to get the information, sorry...');
+  });
 }
 
 init();

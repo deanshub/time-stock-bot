@@ -20,8 +20,11 @@ function bestAskFor(stock){
 }
 
 function getCurrentDataOfStocks(stocks) {
-  var query = 'SELECT * FROM yahoo.finance.quotes WHERE symbol IN ("' + stocks.join('","').toUpperCase() +'")';
   return Q.promise(function (resolve, reject) {
+    if (stocks.length===0){
+      return resolve({});
+    }
+    var query = 'SELECT * FROM yahoo.finance.quotes WHERE symbol IN ("' + stocks.join('","').toUpperCase() +'")';
     request(yahooapiPrefix+query+yahooapiPostfix, function (error, response, body) {
       if (error || response.statusCode !== 200) {
         return reject(error);
@@ -59,6 +62,9 @@ function compareStocks(a, b) {
 // historical data
 function getHistoricDataOfStocks(stocks, startDate, endDate) {
   return Q.promise(function (resolve, reject) {
+    if (stocks.length===0){
+      return resolve({});
+    }
     var startDateString = dateToString(startDate);
     var endDateString = dateToString(endDate);
     var query ='SELECT Symbol,Date,Close,Adj_Close FROM yahoo.finance.historicaldata WHERE symbol IN ("'+stocks.join('","').toUpperCase()+'") '+
@@ -155,12 +161,29 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   }
   return checkIfShouldBuy(stocks, startDate, ratio).then(function (winningStocks) {
     return winningStocks.map(function (stock) {
-      return stock.stockSign + '\n prediction: '+stock.prediction.toFixed(2) + '  current:' +
-      stock.askingPrice + 'by ' + stock.askingPriceProp +' ('+stock.diffPercentage.toFixed(2)+'%)';
+      return {
+        stockSign: stock.stockSign,
+        message: stock.stockSign + '\n prediction: '+stock.prediction.toFixed(2) + '  current:' +
+        stock.askingPrice + ' by ' + stock.askingPriceProp +' ('+stock.diffPercentage.toFixed(2)+'%)',
+      };
     });
+  });
+}
+
+function getPredictionInfo(stockSign) {
+  var uppercaseStockSign = stockSign.toUpperCase();
+  return getCurrentDataOfStocks([stockSign]).then(function (stockVals) {
+    var messageBody = stockSign.toUpperCase() + ' info:\n';
+    for(var prop in stockVals[uppercaseStockSign]){
+      if (stockVals[uppercaseStockSign][prop]!==null && stockVals[uppercaseStockSign][prop]!==undefined){
+        messageBody+= prop + ': ' + stockVals[uppercaseStockSign][prop] + '\n';
+      }
+    }
+    return messageBody;
   });
 }
 
 module.exports = {
   getPredictions: getPredictions,
+  getPredictionInfo: getPredictionInfo,
 };
