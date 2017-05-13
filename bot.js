@@ -307,18 +307,28 @@ function allStocksTimeHandler(msg, match){
 }
 
 function stocksAlreadyAlerted(stock){
-  if (stock.lastAlerted && ((new Date()).toDateString() !== stock.lastAlerted.toDateString())){
+  if ((stock.lastAlerted===undefined) ||
+    (stock.lastAlerted!==undefined &&
+      ((new Date()).toDateString() !== stock.lastAlerted.toDateString()))
+    ){
     return true;
   }
   return false;
 }
 
 function sendPredictions(fromId, daysOrMonths, timeBack, percentRatio) {
-  var stocks = getStocksSignOfUser(fromId).filter(stocksAlreadyAlerted);
+  var stocks = getStocksSignOfUser(fromId).filter(function (stockSign) {
+    return stocksAlreadyAlerted(schedules[fromId][stockSign]);
+  });
   smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
-    if (predictions && predictions.length>0){
+    if (predictions!==undefined && predictions.length>0){
       var predictionMessage = predictions.map(function (prediction) {
-        schedules[fromId][prediction.stockSign].lastAlerted = new Date();
+        if (schedules[fromId][prediction.stockSign]!==undefined){
+          schedules[fromId][prediction.stockSign].lastAlerted = new Date();
+        }else if (schedules[fromId][prediction.stockSign.toLowerCase()]!==undefined) {
+          schedules[fromId][prediction.stockSign.toLowerCase()].lastAlerted = new Date();
+        }
+
         return prediction.message;
       }).join('\n');
 
