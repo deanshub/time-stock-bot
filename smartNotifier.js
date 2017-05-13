@@ -56,7 +56,7 @@ function dateToString(date) {
 }
 
 function compareStocks(a, b) {
-  return a.Date > b.Date;
+  return a.Date - b.Date;
 }
 
 // historical data
@@ -126,6 +126,7 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
           return [index, stockVal.Adj_Close];
         });
 
+
         // lose the last trade
         data.pop();
 
@@ -136,7 +137,12 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
           var prediction = data.length * gradient + yIntercept;
           // can also be LastTradePriceOnly
           var diffPercentage = (prediction - currentStockVals[stockSign].bestAskVal)/currentStockVals[stockSign].bestAskVal*100;
-          if (diffPercentage > ratio){
+          var higestClosing = Math.max.apply(null, data.map(function (stock) {
+            return stock[1];
+          }));
+          var currentlyNotHighestAskingPrice = currentStockVals[stockSign].bestAskVal<higestClosing;
+          var highestAndCurrentRatio = currentStockVals[stockSign].bestAskVal/higestClosing;
+          if (diffPercentage > ratio && currentlyNotHighestAskingPrice && highestAndCurrentRatio<0.983){
             winningStocks.push({
               stockSign: stockSign,
               prediction: prediction,
@@ -154,7 +160,7 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
 
 function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   var startDate = new Date();
-  if (daysOrMonths){
+  if (daysOrMonths===1){
     startDate.setDate(startDate.getDate()-numberBack);
   }else {
     startDate.setMonth(startDate.getMonth()-numberBack);
