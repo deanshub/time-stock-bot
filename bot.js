@@ -51,6 +51,7 @@ var allKeyboardOpts ={
   reply_markup:JSON.stringify({
     keyboard:[
       ['/get'],
+      ['/predict'],
     ],
     resize_keyboard: true,
     one_time_keyboard: true,
