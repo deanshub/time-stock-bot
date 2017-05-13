@@ -107,11 +107,11 @@ function reloadSchedules(fileSchedules) {
 
         sched = later.parse.text(textTime);
 
-        (function (userId, daysOrMonths, timeBack, percentRatio) {
+        (function (userId, daysOrMonths, timeBack, percentRatio, sched) {
           t = later.setInterval(function(){
             sendPredictions(userId, daysOrMonths, timeBack, percentRatio);
           }, sched);
-        })(userId, daysOrMonths, timeBack, percentRatio);
+        })(userId, daysOrMonths, timeBack, percentRatio, sched);
 
         if (!schedules[userId]){
           schedules[userId] = {};
@@ -338,11 +338,11 @@ function predictionHandler(msg, match) {
   var sched = later.parse.text('every ' + interval + ' ' + timeFrame);
 
   var t;
-  (function (fromId, daysOrMonths, timeBack, percentRatio) {
+  (function (fromId, daysOrMonths, timeBack, percentRatio, sched) {
     t = later.setInterval(function(){
       sendPredictions(fromId, daysOrMonths, timeBack, percentRatio);
     }, sched);
-  })(fromId, daysOrMonths, timeBack, percentRatio);
+  })(fromId, daysOrMonths, timeBack, percentRatio, sched);
 
   if (schedules[fromId][PREDICTION_SIGN]){
     schedules[fromId][PREDICTION_SIGN].clear();
@@ -368,7 +368,8 @@ function predictNowHandler(msg){
     var percentRatio = schedules[fromId][PREDICTION_SIGN].percentRatio;
 
     var stocks = getStocksSignOfUser(fromId);
-    smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio).then(function (predictions) {
+    smartNotifier.getPredictions(stocks, daysOrMonths, timeBack, percentRatio)
+    .then(function (predictions) {
       if (predictions && predictions.length>0){
         var predictionMessage = predictions.map(function (prediction) {
           return prediction.message;
