@@ -60,6 +60,7 @@ var allKeyboardOpts ={
     one_time_keyboard: true,
   }),
   parse_mode: 'Markdown',
+  disable_web_page_preview:true,
 };
 
 function init() {
@@ -202,7 +203,7 @@ function graphHandler(msg, match) {
   var timePeriod = match[3]||'d';
 
   sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t='+
-    amountPeriod+timePeriod+'&q=c&l=on&z=l');
+    amountPeriod+timePeriod+'&q=c&l=on&z=l',{disable_web_page_preview:false});
 }
 
 function helpHandler(msg) {
@@ -412,8 +413,8 @@ function infoHandler(msg, match) {
   });
 }
 
-function sendMessage(id, message){
-  bot.sendMessage(id, message, allKeyboardOpts);
+function sendMessage(id, message, extraOps){
+  bot.sendMessage(id, message, Object.assign({},allKeyboardOpts,extraOps));
 }
 
 init();
