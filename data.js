@@ -89,6 +89,7 @@ function normalizeStock(body, api){
 
     const previousClose =  stringToNumber(stockVal['Time Series (Daily)'][dailyValuesKeys[1]]);
     const diff = parsedStock.currentValue - previousClose;
+    parsedStock.change = diff;
     parsedStock.pchange = diff / previousClose * 100;
   }
 
