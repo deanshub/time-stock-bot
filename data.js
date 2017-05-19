@@ -181,12 +181,12 @@ function normalizeHistoricData(data){
   const normalizedValues = Object.keys(values).sort((a,b)=>new Date(a) - new Date(b)).map((date)=>{
     const stockProps = Object.keys(values[date]);
     return {
-      Date: new Date(date),
-      Open: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('open'))]),
-      High: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('high'))]),
-      Low: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('low'))]),
-      Close: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('close'))]),
-      Volume: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('volume'))]),
+      date: new Date(date),
+      open: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('open'))]),
+      high: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('high'))]),
+      low: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('low'))]),
+      close: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('close'))]),
+      volume: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('volume'))]),
     };
 
   });

@@ -2,6 +2,8 @@ var request = require('request');
 var Q = require('q');
 var regression = require('regression');
 
+const data = require('./data');
+
 var yahooapiPrefix = 'http://query.yahooapis.com/v1/public/yql?q=';
 var yahooapiPostfix = '&format=json&env=store://datatables.org/alltableswithkeys';
 
@@ -102,16 +104,10 @@ function getHistoricDataOfStocks(stocks, startDate, endDate) {
   });
 }
 
-// getCurrentDataOfStocks(['FB','AAPL']).then(console.log);
-
-// var startDate = new Date();
-// startDate.setMonth(startDate.getMonth()-1);
-// var endDate = new Date();
-// getHistoricDataOfStocks(['FB','AAPL'], startDate, endDate).then(console.log);
-
 function checkIfShouldBuy(stocks, startDate, ratio) {
+  const bestAskProp = 'close';
   var winningStocks = [];
-  return Q.all([getCurrentDataOfStocks(stocks), getHistoricDataOfStocks(stocks, startDate, new Date())])
+  return Q.all([data.getCurrentData(stocks), data.getHistoricData(stocks, startDate, new Date())])
   .then(function (results) {
     var currentStockVals = results[0];
     var historicStockVals = results[1];
@@ -120,10 +116,10 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
     // if currentStockVals[stock] - ratio < linear regression prediction to this date
     // return that should buy
     for (var stockSign in currentStockVals){
-      if (currentStockVals[stockSign].bestAskVal!==undefined && historicStockVals[stockSign]!==undefined){
+      if (currentStockVals[stockSign].close!==undefined && historicStockVals[stockSign]!==undefined){
         var data = historicStockVals[stockSign].map(function (stockVal, index) {
           // can also be Close
-          return [index, stockVal.Adj_Close];
+          return [index, stockVal[bestAskProp]];
         });
 
 
@@ -136,18 +132,18 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
         if(gradient>0){
           var prediction = data.length * gradient + yIntercept;
           // can also be LastTradePriceOnly
-          var diffPercentage = (prediction - currentStockVals[stockSign].bestAskVal)/currentStockVals[stockSign].bestAskVal*100;
+          var diffPercentage = (prediction - currentStockVals[stockSign][bestAskProp])/currentStockVals[stockSign][bestAskProp]*100;
           var higestClosing = Math.max.apply(null, data.map(function (stock) {
             return stock[1];
           }));
-          var currentlyNotHighestAskingPrice = currentStockVals[stockSign].bestAskVal<higestClosing;
-          var highestAndCurrentRatio = currentStockVals[stockSign].bestAskVal/higestClosing;
-          if (diffPercentage > ratio && currentlyNotHighestAskingPrice && highestAndCurrentRatio<0.983){
+          var currentlyNotHighestAskingPrice = currentStockVals[stockSign][bestAskProp]<higestClosing;
+          var highestAndCurrentRatio = currentStockVals[stockSign][bestAskProp]/higestClosing;
+          if (diffPercentage > ratio && currentlyNotHighestAskingPrice && highestAndCurrentRatio<0.985){
             winningStocks.push({
               stockSign: stockSign,
               prediction: prediction,
-              askingPrice: currentStockVals[stockSign].bestAskVal,
-              askingPriceProp: currentStockVals[stockSign].bestAskProp,
+              askingPrice: currentStockVals[stockSign][bestAskProp],
+              askingPriceProp: bestAskProp,
               diffPercentage: diffPercentage,
             });
           }
@@ -157,6 +153,54 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
     return winningStocks;
   });
 }
+// function checkIfShouldBuyOLD(stocks, startDate, ratio) {
+//   var winningStocks = [];
+//   return Q.all([getCurrentDataOfStocks(stocks), getHistoricDataOfStocks(stocks, startDate, new Date())])
+//   .then(function (results) {
+//     var currentStockVals = results[0];
+//     var historicStockVals = results[1];
+//     // forEach stock in currentStockVals
+//     // get linear regression within historicStockVals[stock]
+//     // if currentStockVals[stock] - ratio < linear regression prediction to this date
+//     // return that should buy
+//     for (var stockSign in currentStockVals){
+//       if (currentStockVals[stockSign].bestAskVal!==undefined && historicStockVals[stockSign]!==undefined){
+//         var data = historicStockVals[stockSign].map(function (stockVal, index) {
+//           // can also be Close
+//           return [index, stockVal.Adj_Close];
+//         });
+//
+//
+//         // lose the last trade
+//         data.pop();
+//
+//         var equation = regression('linear', data).equation;
+//         var gradient = equation[0];
+//         var yIntercept = equation[1];
+//         if(gradient>0){
+//           var prediction = data.length * gradient + yIntercept;
+//           // can also be LastTradePriceOnly
+//           var diffPercentage = (prediction - currentStockVals[stockSign].bestAskVal)/currentStockVals[stockSign].bestAskVal*100;
+//           var higestClosing = Math.max.apply(null, data.map(function (stock) {
+//             return stock[1];
+//           }));
+//           var currentlyNotHighestAskingPrice = currentStockVals[stockSign].bestAskVal<higestClosing;
+//           var highestAndCurrentRatio = currentStockVals[stockSign].bestAskVal/higestClosing;
+//           if (diffPercentage > ratio && currentlyNotHighestAskingPrice && highestAndCurrentRatio<0.985){
+//             winningStocks.push({
+//               stockSign: stockSign,
+//               prediction: prediction,
+//               askingPrice: currentStockVals[stockSign].bestAskVal,
+//               askingPriceProp: currentStockVals[stockSign].bestAskProp,
+//               diffPercentage: diffPercentage,
+//             });
+//           }
+//         }
+//       }
+//     }
+//     return winningStocks;
+//   });
+// }
 
 function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   var startDate = new Date();
