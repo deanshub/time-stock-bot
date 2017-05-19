@@ -181,7 +181,7 @@ function normalizeHistoricData(data){
   if (values===undefined){
     values=[];
   }
-  const normalizedValues = Object.keys(values).sort((a,b)=>new Date(a) - new Date(b)).map((date)=>{
+  const normalizedValues = Object.keys(values).sort((a,b)=>new Date(b) - new Date(a)).map((date)=>{
     return {
       date: new Date(date),
       open: stringToNumber(getValOfObjByKey('open', values[date])),
