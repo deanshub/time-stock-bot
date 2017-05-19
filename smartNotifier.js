@@ -111,11 +111,11 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
   }
   return checkIfShouldBuy(stocks, startDate, ratio).then(function (winningStocks) {
     return winningStocks.map(function (stock) {
+      const symbolUpper = stock.stockSign.toUpperCase();
       return {
         stockSign: stock.stockSign,
-        message: '*'+stock.stockSign.toUpperCase() +' (+'+stock.diffPercentage.toFixed(2)+'%)*\nprediction: '+
-        stock.prediction.toFixed(2) + '  current:' + stock.askingPrice +
-        '\n[by ' + stock.askingPriceProp+']',
+        message:`[${symbolUpper} (+${stock.diffPercentage.toFixed(2)}%)](https://finance.yahoo.com/quote/${symbolUpper})\n
+        prediction: ${stock.prediction.toFixed(2)}  current:${stock.askingPrice}\n\n`,
       };
     });
   });
