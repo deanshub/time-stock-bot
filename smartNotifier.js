@@ -114,8 +114,7 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
       const symbolUpper = stock.stockSign.toUpperCase();
       return {
         stockSign: stock.stockSign,
-        message:`[${symbolUpper} (+${stock.diffPercentage.toFixed(2)}%)](https://finance.yahoo.com/quote/${symbolUpper})
-        prediction: ${stock.prediction.toFixed(2)}  current:${stock.askingPrice}\n`,
+        message:`[${symbolUpper}   (+${stock.diffPercentage.toFixed(2)}%)](https://finance.yahoo.com/quote/${symbolUpper})\nprediction: ${stock.prediction.toFixed(2)}  current:${stock.askingPrice}\n`,
       };
     });
   });
