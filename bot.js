@@ -3,6 +3,7 @@ var TelegramBot = require('node-telegram-bot-api');
 var later = require('later');
 var Q = require('q');
 
+const data = require('./data');
 var helpers = require('./helpers');
 var smartNotifier = require('./smartNotifier');
 var PREDICTION_SIGN = '~';
@@ -50,8 +51,8 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
 var allKeyboardOpts ={
   reply_markup:JSON.stringify({
     keyboard:[
-      ['/get'],
       ['/predict'],
+      ['/get'],
     ],
     resize_keyboard: true,
     one_time_keyboard: true,
@@ -135,15 +136,16 @@ function reloadSchedules(fileSchedules) {
 
 
 function getStockMessage(fromId, stockSign) {
-  return helpers.getStockBySign(stockSign).then(function (stockValues) {
-    var message = helpers.stockToMessage(stockValues);
+  return data.getCurrentData([stockSign])
+    .then(function (stockValues) {
+      var message = helpers.stockToMessage(stockValues);
 
-    message+=getNumberDiff(fromId, stockSign, stockValues.currentValue);
-    return message;
-  }).catch(function (err) {
-    console.log(err);
-    return 'sorry, I failed to get you ' + stockSign + '\n';
-  });
+      message+=getNumberDiff(fromId, stockSign, stockValues.currentValue);
+      return message;
+    }).catch(function (err) {
+      console.log(err);
+      return 'sorry, I failed to get you ' + stockSign + '\n';
+    });
 }
 
 function sendStockInfo(fromId, stockSign){
