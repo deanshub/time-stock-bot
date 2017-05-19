@@ -45,6 +45,12 @@ function stringToNumber(value){
   return returnValue;
 }
 
+function getValOfObjByKey(key,obj){
+  const keys = Object.keys(obj);
+  const keyIndex = keys.findIndex(a=>a.includes(key));
+  return obj[keys[keyIndex]];
+}
+
 function normalizeStock(body, api){
   let stockVal;
   if (api===API.ALPHAVANTAGE){
@@ -82,17 +88,16 @@ function normalizeStock(body, api){
     }
     parsedStock.currentValue = parsedStock.low!==undefined?parsedStock.low:parsedStock.price;
   }else{
-    parsedStock.symbol = stockVal['Meta Data']['1: Symbol'];
-    parsedStock.lastRefreshed = new Date(stockVal['Meta Data']['3. Last Refreshed']);
+    parsedStock.symbol = getValOfObjByKey('Symobl' ,stockVal['Meta Data']);
+    parsedStock.lastRefreshed = new Date(getValOfObjByKey('Symobl' ,stockVal['Last Refreshed']));
     const dailyValuesKeys = Object.keys(stockVal['Time Series (Daily)']);
     const todaysVals = stockVal['Time Series (Daily)'][dailyValuesKeys[0]];
-    const todaysValsKeys = Object.keys(todaysVals);
 
-    const openString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('open'))]];
-    const highString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('high'))]];
-    const lowString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('low'))]];
-    const closeString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('close'))]];
-    const volumeString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('volume'))]];
+    const openString = getValOfObjByKey('open',todaysVals);
+    const highString = getValOfObjByKey('high',todaysVals);
+    const lowString = getValOfObjByKey('low',todaysVals);
+    const closeString = getValOfObjByKey('close',todaysVals);
+    const volumeString = getValOfObjByKey('volume',todaysVals);
 
     parsedStock.open = stringToNumber(openString);
     parsedStock.high = stringToNumber(highString);
@@ -102,8 +107,7 @@ function normalizeStock(body, api){
     parsedStock.currentValue = parsedStock.close;
 
     const previousVals = stockVal['Time Series (Daily)'][dailyValuesKeys[1]];
-    const previousValsKeys = Object.keys(previousVals);
-    const previousClose =  stringToNumber(previousVals[previousValsKeys[previousValsKeys.findIndex(a=>a.includes('close'))]]);
+    const previousClose = stringToNumber(getValOfObjByKey('close',previousVals));
 
     const diff = parsedStock.currentValue - previousClose;
     parsedStock.change = diff;
