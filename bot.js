@@ -27,6 +27,7 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/stock - get full report on all added stocks\n'+
     '/stock <STOCK_SIGN> - current stock values\n'+
     '/get - alias for /stock\n'+
+    '/info <STOCK_SIGN> - get all information on the stock\n'+
     '/add <STOCK_SIGN> - add stock to full stocks report\n'+
     '/remove <STOCK_SIGN> - remove stock from full stocks report\n'+
     '/time <TIME> - send a full stocks report at a certain time\n'+
@@ -41,6 +42,7 @@ var botDescription='Hi, I\'m TimeStockBot\n'+
     '/help - to get this message\n'+
     '\nExamples:\n'+
     '/stock fb\n'+
+    '/info fb\n'+
     '/add fb\n'+
     '/add aapl\n'+
     '/graph wix 1y\n'+
@@ -57,6 +59,7 @@ var allKeyboardOpts ={
     resize_keyboard: true,
     one_time_keyboard: true,
   }),
+  parse_mode: 'Markdown',
 };
 
 function init() {
@@ -151,7 +154,7 @@ function getStockMessage(fromId, stockSign) {
 
 function sendStockInfo(fromId, stockSign){
   getStockMessage(fromId, stockSign).then(function (message) {
-    bot.sendMessage(fromId, message, allKeyboardOpts);
+    sendMessage(fromId, message);
   });
 }
 
@@ -160,10 +163,10 @@ function cancelStockScheduling(fromId, stockSign){
     schedules[fromId][stockSign].clear();
     schedules[fromId][stockSign]=null;
     helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK', allKeyboardOpts);
+    sendMessage(fromId, 'OK');
     return true;
   }else{
-    bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
+    sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
     return false;
   }
 }
@@ -173,7 +176,7 @@ function getNumberDiff(fromId, stockSign, currentValue) {
     var diffNumber = currentValue - schedules[fromId][stockSign].numberToDiff;
     var diffPercentage = diffNumber/schedules[fromId][stockSign].numberToDiff*100;
 
-    return helpers.fill(' Diff:') + helpers.numberWithSign(diffNumber) + ' (' + helpers.numberWithSign(diffPercentage)+ '%)\n';
+    return helpers.fill(' _Diff:_') + helpers.numberWithSign(diffNumber) + ' (*' + helpers.numberWithSign(diffPercentage)+ '%*)\n';
   }else{
     return '';
   }
@@ -198,13 +201,13 @@ function graphHandler(msg, match) {
   amountPeriod = amountPeriod===''?3:parseInt(amountPeriod);
   var timePeriod = match[3]||'d';
 
-  bot.sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t='+
-    amountPeriod+timePeriod+'&q=c&l=on&z=l', allKeyboardOpts);
+  sendMessage(fromId, 'http://chart.finance.yahoo.com/z?s='+stockSign+'&t='+
+    amountPeriod+timePeriod+'&q=c&l=on&z=l');
 }
 
 function helpHandler(msg) {
   var fromId = msg.from.id;
-  bot.sendMessage(fromId, botDescription, allKeyboardOpts);
+  sendMessage(fromId, botDescription);
 }
 
 function allStocksHandler(msg) {
@@ -216,13 +219,13 @@ function allStocksHandler(msg) {
       return getStockMessage(fromId, stockSign);
     });
     Q.all(allMessagesPromises).then(function (allMessages) {
-      bot.sendMessage(fromId, allMessages.join(''), allKeyboardOpts);
+      sendMessage(fromId, allMessages.join(''));
     }).catch(function (err) {
       console.log(err);
-      bot.sendMessage(fromId, 'I seem to have a problem...');
+      sendMessage(fromId, 'I seem to have a problem...');
     });
   }else{
-    bot.sendMessage(fromId, 'sorry, you don\'t have any scheduled stocks');
+    sendMessage(fromId, 'sorry, you don\'t have any scheduled stocks');
   }
 }
 
@@ -241,10 +244,10 @@ function diffHandler(msg, match) {
   if (schedules[fromId] && schedules[fromId][stockSign]){
     schedules[fromId][stockSign].numberToDiff = numberToDiff;
     helpers.writeSchedules(schedules);
-    bot.sendMessage(fromId, 'OK', allKeyboardOpts);
+    sendMessage(fromId, 'OK');
     return true;
   }else{
-    bot.sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
+    sendMessage(fromId, 'I didn\'t find any scheduling on '+ stockSign +'...');
     return false;
   }
 }
@@ -260,7 +263,7 @@ function stockAddHandler(msg, match) {
   schedules[fromId][stockSign] = new Date();
 
   helpers.writeSchedules(schedules);
-  bot.sendMessage(fromId, stockSign + ' added', allKeyboardOpts);
+  sendMessage(fromId, stockSign + ' added');
 }
 
 function stockRemoveHandler(msg, match){
@@ -272,7 +275,7 @@ function stockRemoveHandler(msg, match){
   }
 
   helpers.writeSchedules(schedules);
-  bot.sendMessage(fromId, stockSign + ' removed', allKeyboardOpts);
+  sendMessage(fromId, stockSign + ' removed');
 }
 
 function allStocksTimeHandler(msg, match){
@@ -303,10 +306,10 @@ function allStocksTimeHandler(msg, match){
       schedules[fromId][ALL_STOCKS_SIGN].textTime = textTime;
 
       helpers.writeSchedules(schedules);
-      bot.sendMessage(fromId, 'OK', allKeyboardOpts);
+      sendMessage(fromId, 'OK');
     }
   }else{
-    bot.sendMessage(fromId, 'you don\'t have any stocks, you can add some using /stock');
+    sendMessage(fromId, 'you don\'t have any stocks, you can add some using /stock');
   }
 }
 
@@ -336,7 +339,7 @@ function sendPredictions(fromId, daysOrMonths, timeBack, percentRatio) {
         return prediction.message;
       }).join('\n');
 
-      bot.sendMessage(fromId, predictionMessage);
+      sendMessage(fromId, predictionMessage);
     }
   });
 }
@@ -388,13 +391,13 @@ function predictNowHandler(msg){
         var predictionMessage = predictions.map(function (prediction) {
           return prediction.message;
         }).join('\n');
-        bot.sendMessage(fromId, predictionMessage);
+        sendMessage(fromId, predictionMessage);
       }else{
-        bot.sendMessage(fromId, 'no predictions found for the specified settings\n');
+        sendMessage(fromId, 'no predictions found for the specified settings\n');
       }
     });
   }else {
-    bot.sendMessage(fromId, 'you have not defined your prediction settings yet');
+    sendMessage(fromId, 'you have not defined your prediction settings yet');
   }
 }
 
@@ -402,11 +405,15 @@ function infoHandler(msg, match) {
   var fromId = msg.from.id;
   var stockSign = match[1];
   smartNotifier.getPredictionInfo(stockSign).then(function (stockInfo) {
-    bot.sendMessage(fromId, stockInfo);
+    sendMessage(fromId, stockInfo);
   }).catch(function (err) {
     console.log(err);
-    bot.sendMessage(fromId, 'I got a problem when I tried to get the information, sorry...');
+    sendMessage(fromId, 'I got a problem when I tried to get the information, sorry...');
   });
+}
+
+function sendMessage(id, message){
+  bot.sendMessage(id, message, allKeyboardOpts);
 }
 
 init();

@@ -113,7 +113,7 @@ function getPredictions(stocks, daysOrMonths, numberBack, ratio) {
     return winningStocks.map(function (stock) {
       return {
         stockSign: stock.stockSign,
-        message: stock.stockSign +' (+'+stock.diffPercentage.toFixed(2)+'%)\nprediction: '+
+        message: '*'+stock.stockSign.toUpperCase() +' (+'+stock.diffPercentage.toFixed(2)+'%)*\nprediction: '+
         stock.prediction.toFixed(2) + '  current:' + stock.askingPrice +
         '\n[by ' + stock.askingPriceProp+']',
       };

@@ -82,7 +82,7 @@ function numberWithSign(value) {
 }
 
 function stockToMessage(stockValues) {
-  var messageBody = fill(stockValues.symbol.toUpperCase() +'  ' +stockValues.currentValue.toFixed(2)) +
+  var messageBody = fill('*'+stockValues.symbol.toUpperCase() +'*  ' +stockValues.currentValue.toFixed(2)) +
   numberWithSign(stockValues.change)+' ('+numberWithSign(stockValues.pchange)+'%)\n';
   // realtime is in stockValues.rchange and stockValues.rpchange
 

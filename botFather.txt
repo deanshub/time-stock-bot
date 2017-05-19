@@ -1,5 +1,6 @@
 stock - get stock value
 get - same as stock
+info - get information on stock
 add - add stock to full report
 remove - remove stock from full report
 time - set full report time
