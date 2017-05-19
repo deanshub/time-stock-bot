@@ -83,8 +83,7 @@ function numberWithSign(value) {
 
 function stockToMessage(stockValues) {
   const symbolUpper = stockValues.symbol.toUpperCase();
-  var messageBody = `[${symbolUpper}  ${stockValues.currentValue.toFixed(2)}](https://finance.yahoo.com/quote/${symbolUpper})
-          ${numberWithSign(stockValues.change)} (${numberWithSign(stockValues.pchange)}%)\n`;
+  var messageBody = `[${symbolUpper}  ${stockValues.currentValue.toFixed(2)}](https://finance.yahoo.com/quote/${symbolUpper})      ${numberWithSign(stockValues.change)} (${numberWithSign(stockValues.pchange)}%)\n`;
 
   return messageBody;
 }
