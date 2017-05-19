@@ -85,9 +85,26 @@ function normalizeStock(body, api){
     parsedStock.symbol = stockVal['Meta Data']['1: Symbol'];
     parsedStock.lastRefreshed = new Date(stockVal['Meta Data']['3. Last Refreshed']);
     const dailyValuesKeys = Object.keys(stockVal['Time Series (Daily)']);
-    parsedStock.currentValue = stringToNumber(stockVal['Time Series (Daily)'][dailyValuesKeys[0]]);
+    const todaysVals = stockVal['Time Series (Daily)'][dailyValuesKeys[0]];
+    const todaysValsKeys = Object.keys(todaysVals);
 
-    const previousClose =  stringToNumber(stockVal['Time Series (Daily)'][dailyValuesKeys[1]]);
+    const openString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('open'))]];
+    const highString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('high'))]];
+    const lowString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('low'))]];
+    const closeString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('close'))]];
+    const volumeString = todaysVals[todaysValsKeys[todaysValsKeys.findIndex(a=>a.includes('volume'))]];
+
+    parsedStock.open = stringToNumber(openString);
+    parsedStock.high = stringToNumber(highString);
+    parsedStock.low = stringToNumber(lowString);
+    parsedStock.close = stringToNumber(closeString);
+    parsedStock.volume = stringToNumber(volumeString);
+    parsedStock.currentValue = parsedStock.close;
+
+    const previousVals = stockVal['Time Series (Daily)'][dailyValuesKeys[1]];
+    const previousValsKeys = Object.keys(previousVals);
+    const previousClose =  stringToNumber(previousVals[previousValsKeys[previousValsKeys.findIndex(a=>a.includes('close'))]]);
+
     const diff = parsedStock.currentValue - previousClose;
     parsedStock.change = diff;
     parsedStock.pchange = diff / previousClose * 100;
@@ -104,8 +121,12 @@ function getCurrentSingleStockData(stock, api) {
         if (error || response.statusCode !== 200) {
           return reject(error||'Error getting data');
         }else{
-          const stock = normalizeStock(body, api);
-          resolve(stock);
+          try{
+            const stockVal = normalizeStock(body, api);
+            resolve(stockVal);
+          }catch(e){
+            reject(e);
+          }
         }
       });
     }else{
@@ -113,7 +134,7 @@ function getCurrentSingleStockData(stock, api) {
     }
   }).catch(()=>{
     if (api<API.DEFAULT){
-      return getCurrentData(stock, api+1);
+      return getCurrentSingleStockData(stock, api+1);
     }else{
       return Promise.reject('Can\'t get current data of stock');
     }
@@ -122,7 +143,7 @@ function getCurrentSingleStockData(stock, api) {
 
 function getCurrentData(stocks=[], api=API.ALPHAVANTAGE){
   return Promise.all(stocks.map((stock)=>{
-    getCurrentSingleStockData(stock, api);
+    return getCurrentSingleStockData(stock, api);
   })).then((stocksData, index)=>{
     return stocksData.reduce((res,curr)=>{
       res[stocks[index]] = curr;
