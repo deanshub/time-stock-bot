@@ -123,7 +123,12 @@ function getCurrentSingleStockData(stock, api) {
 function getCurrentData(stocks=[], api=API.ALPHAVANTAGE){
   return Promise.all(stocks.map((stock)=>{
     getCurrentSingleStockData(stock, api);
-  }));
+  })).then((stocksData, index)=>{
+    return stocksData.reduce((res,curr)=>{
+      res[stocks[index]] = curr;
+      return res;
+    },{});
+  });
 }
 
 const ONE_DAY = 24*60*60*1000;

@@ -137,7 +137,8 @@ function reloadSchedules(fileSchedules) {
 
 function getStockMessage(fromId, stockSign) {
   return data.getCurrentData([stockSign])
-    .then(function (stockValues) {
+    .then(function (stocksValues) {
+      const stockValues = stocksValues[stockSign];
       var message = helpers.stockToMessage(stockValues);
 
       message+=getNumberDiff(fromId, stockSign, stockValues.currentValue);
