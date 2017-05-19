@@ -89,7 +89,7 @@ function normalizeStock(body, api){
     parsedStock.currentValue = parsedStock.low!==undefined?parsedStock.low:parsedStock.price;
   }else{
     parsedStock.symbol = getValOfObjByKey('Symbol' ,stockVal['Meta Data']);
-    parsedStock.lastRefreshed = new Date(getValOfObjByKey('Symobl' ,stockVal['Last Refreshed']));
+    parsedStock.lastRefreshed = new Date(getValOfObjByKey('Last Refreshed' ,stockVal['Meta Data']));
     const dailyValuesKeys = Object.keys(stockVal['Time Series (Daily)']);
     const todaysVals = stockVal['Time Series (Daily)'][dailyValuesKeys[0]];
 
@@ -177,16 +177,19 @@ function buildHistoricQuery(stock, startDate, endDate){
 
 function normalizeHistoricData(data){
   const parsedData = JSON.parse(data);
-  const values = parsedData(Object.keys(parsedData)[1]);
+  let values = parsedData[Object.keys(parsedData)[1]];
+  if (values===undefined){
+    values=[];
+  }
   const normalizedValues = Object.keys(values).sort((a,b)=>new Date(a) - new Date(b)).map((date)=>{
-    const stockProps = Object.keys(values[date]);
     return {
       date: new Date(date),
-      open: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('open'))]),
-      high: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('high'))]),
-      low: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('low'))]),
-      close: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('close'))]),
-      volume: stringToNumber(values[date][stockProps.findIndex(prop=>prop.includes('volume'))]),
+      open: stringToNumber(getValOfObjByKey('open', values[date])),
+      high: stringToNumber(getValOfObjByKey('high', values[date])),
+      low: stringToNumber(getValOfObjByKey('low', values[date])),
+      close: stringToNumber(getValOfObjByKey('close', values[date])),
+      volume: stringToNumber(getValOfObjByKey('volume', values[date])),
+      currentValue: stringToNumber(getValOfObjByKey('close', values[date])),
     };
 
   });
@@ -216,8 +219,8 @@ function getHistoricData(stocks=[], startDate, endDate){
     return getHistoricSingleStockData(stock, startDate, endDate).catch(()=>{
       return getHistoricSingleStockData(stock, startDate, endDate);
     });
-  })).then((historicData, index)=>{
-    return historicData.reduce((res,curr)=>{
+  })).then((historicData)=>{
+    return historicData.reduce((res,curr, index)=>{
       res[stocks[index]] = curr;
       return res;
     },{});

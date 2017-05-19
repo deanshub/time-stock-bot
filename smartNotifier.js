@@ -105,7 +105,7 @@ function getHistoricDataOfStocks(stocks, startDate, endDate) {
 }
 
 function checkIfShouldBuy(stocks, startDate, ratio) {
-  const bestAskProp = 'close';
+  const bestAskProp = 'currentValue';
   var winningStocks = [];
   return Q.all([data.getCurrentData(stocks), data.getHistoricData(stocks, startDate, new Date())])
   .then(function (results) {
@@ -116,7 +116,7 @@ function checkIfShouldBuy(stocks, startDate, ratio) {
     // if currentStockVals[stock] - ratio < linear regression prediction to this date
     // return that should buy
     for (var stockSign in currentStockVals){
-      if (currentStockVals[stockSign].close!==undefined && historicStockVals[stockSign]!==undefined){
+      if (currentStockVals[stockSign][bestAskProp]!==undefined && historicStockVals[stockSign]!==undefined){
         var data = historicStockVals[stockSign].map(function (stockVal, index) {
           // can also be Close
           return [index, stockVal[bestAskProp]];
