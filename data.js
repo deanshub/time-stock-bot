@@ -88,7 +88,7 @@ function normalizeStock(body, api){
     }
     parsedStock.currentValue = parsedStock.low!==undefined?parsedStock.low:parsedStock.price;
   }else{
-    parsedStock.symbol = getValOfObjByKey('Symobl' ,stockVal['Meta Data']);
+    parsedStock.symbol = getValOfObjByKey('Symbol' ,stockVal['Meta Data']);
     parsedStock.lastRefreshed = new Date(getValOfObjByKey('Symobl' ,stockVal['Last Refreshed']));
     const dailyValuesKeys = Object.keys(stockVal['Time Series (Daily)']);
     const todaysVals = stockVal['Time Series (Daily)'][dailyValuesKeys[0]];
@@ -148,8 +148,8 @@ function getCurrentSingleStockData(stock, api) {
 function getCurrentData(stocks=[], api=API.ALPHAVANTAGE){
   return Promise.all(stocks.map((stock)=>{
     return getCurrentSingleStockData(stock, api);
-  })).then((stocksData, index)=>{
-    return stocksData.reduce((res,curr)=>{
+  })).then((stocksData)=>{
+    return stocksData.reduce((res,curr, index)=>{
       res[stocks[index]] = curr;
       return res;
     },{});
