@@ -22,33 +22,34 @@ var bot = new TelegramBot(token, options);
 bot.setWebHook('stock.shubapp.com:443/bot'+token, __dirname+'/crt.pem');
 var schedules={};
 
-var botDescription='Hi, I\'m TimeStockBot\n'+
-    'This is what I can do:\n'+
-    '/stock - get full report on all added stocks\n'+
-    '/stock <STOCK_SIGN> - current stock values\n'+
-    '/get - alias for /stock\n'+
-    '/info <STOCK_SIGN> - get all information on the stock\n'+
-    '/add <STOCK_SIGN> - add stock to full stocks report\n'+
-    '/remove <STOCK_SIGN> - remove stock from full stocks report\n'+
-    '/time <TIME> - send a full stocks report at a certain time\n'+
-    '/time cancel - stop automatic message of full stocks report\n'+
-    '/graph <STOCK_SIGN> - stock 3 day graph\n'+
-    '/graph <STOCK_SIGN> <PERIOD_AMOUNT><PERIDO_SIGN> - stock graph by time period\n'+
-    '                  PERIOD_AMOUNT = number  PERIDO_SIGN = d|m|y\n'+
-    '/diff <STOCK_SIGN> <NUMBER> - added stocks will also show ratio to this number\n'+
-    '/predict <DAYS_OR_MONTHS> <TIME_BACK> <PERCENT> <INTERVAL> <TIME_FRAME> - shows prediction when to buy the stock,\n'+
-    '         DAYS_OR_MONTHS = 1|0 TIME_BACK=number PERCENT=float INTERVAL=number TIME_FRAME=m|h|D\n'+
-    '/predict - if the previous defined then sends prediction immidiatly\n'+
-    '/help - to get this message\n'+
-    '\nExamples:\n'+
-    '/stock fb\n'+
-    '/info fb\n'+
-    '/add fb\n'+
-    '/add aapl\n'+
-    '/graph wix 1y\n'+
-    '/time at 10:00\n'+
-    '/predict 1 7 5 1 h\n'+
-    'For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png';
+var botDescription=`Hi, I\'m TimeStockBot
+This is what I can do:
+/stock - get full report on all added stocks
+/stock <STOCK-SIGN> - current stock values
+/get - alias for /stock
+/info <STOCK-SIGN> - get all information on the stock
+/add <STOCK-SIGN> - add stock to full stocks report
+/remove <STOCK-SIGN> - remove stock from full stocks report
+/time <TIME> - send a full stocks report at a certain time
+/time cancel - stop automatic message of full stocks report
+/graph <STOCK-SIGN> - stock 3 day graph
+/graph <STOCK-SIGN> <PERIOD-AMOUNT><PERIDO-SIGN> - stock graph by time period
+                  PERIOD-AMOUNT = number  PERIDO-SIGN = d|m|y
+/diff <STOCK-SIGN> <NUMBER> - added stocks will also show ratio to this number
+/predict <DAYS-OR-MONTHS> <TIME-BACK> <PERCENT> <INTERVAL> <TIME-FRAME> - shows prediction when to buy the stock,
+         DAYS-OR-MONTHS = 1|0 TIME-BACK=number PERCENT=float INTERVAL=number TIME-FRAME=m|h|D
+/predict - if the previous defined then sends prediction immidiatly
+/help - to get this message
+
+Examples:
+/stock fb
+/info fb
+/add fb
+/add aapl
+/graph wix 1y
+/time at 10:00
+/predict 1 7 5 1 h
+For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png`;
 
 var allKeyboardOpts ={
   reply_markup:JSON.stringify({
@@ -208,7 +209,7 @@ function graphHandler(msg, match) {
 
 function helpHandler(msg) {
   var fromId = msg.from.id;
-  sendMessage(fromId, botDescription);
+  sendMessage(fromId, botDescription, {disable_web_page_preview:false});
 }
 
 function allStocksHandler(msg) {
