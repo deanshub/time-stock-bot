@@ -22,26 +22,26 @@ var bot = new TelegramBot(token, options);
 bot.setWebHook('stock.shubapp.com:443/bot'+token, __dirname+'/crt.pem');
 var schedules={};
 
-var botDescription=`Hi, I\'m TimeStockBot
+var botDescription=`Hi, I\'m *TimeStockBot*
 This is what I can do:
 /stock - get full report on all added stocks
-/stock <STOCK-SIGN> - current stock values
+/stock _<STOCK-SIGN>_ - current stock values
 /get - alias for /stock
-/info <STOCK-SIGN> - get all information on the stock
-/add <STOCK-SIGN> - add stock to full stocks report
-/remove <STOCK-SIGN> - remove stock from full stocks report
-/time <TIME> - send a full stocks report at a certain time
+/info _<STOCK-SIGN>_ - get all information on the stock
+/add _<STOCK-SIGN>_ - add stock to full stocks report
+/remove _<STOCK-SIGN>_ - remove stock from full stocks report
+/time _<TIME>_ - send a full stocks report at a certain time
 /time cancel - stop automatic message of full stocks report
-/graph <STOCK-SIGN> - stock 3 day graph
-/graph <STOCK-SIGN> <PERIOD-AMOUNT><PERIDO-SIGN> - stock graph by time period
+/graph _<STOCK-SIGN>_ - stock 3 day graph
+/graph _<STOCK-SIGN>_ _<PERIOD-AMOUNT>__<PERIDO-SIGN>_ - stock graph by time period
                   PERIOD-AMOUNT = number  PERIDO-SIGN = d|m|y
-/diff <STOCK-SIGN> <NUMBER> - added stocks will also show ratio to this number
-/predict <DAYS-OR-MONTHS> <TIME-BACK> <PERCENT> <INTERVAL> <TIME-FRAME> - shows prediction when to buy the stock,
+/diff _<STOCK-SIGN>_ _<NUMBER>_ - added stocks will also show ratio to this number
+/predict _<DAYS-OR-MONTHS>_ _<TIME-BACK>_ _<PERCENT>_ _<INTERVAL>_ _<TIME-FRAME>_ - shows prediction when to buy the stock,
          DAYS-OR-MONTHS = 1|0 TIME-BACK=number PERCENT=float INTERVAL=number TIME-FRAME=m|h|D
 /predict - if the previous defined then sends prediction immidiatly
 /help - to get this message
 
-Examples:
+*Examples:*
 /stock fb
 /info fb
 /add fb
@@ -49,13 +49,12 @@ Examples:
 /graph wix 1y
 /time at 10:00
 /predict 1 7 5 1 h
-For more information on <TIME>, see http://bunkat.github.io/later/assets/img/Schedule.png`;
+For more information on _<TIME>_, see http://bunkat.github.io/later/assets/img/Schedule.png`;
 
 var allKeyboardOpts ={
   reply_markup:JSON.stringify({
     keyboard:[
-      ['/predict'],
-      ['/get'],
+      ['/get','/predict'],
     ],
     resize_keyboard: true,
     one_time_keyboard: true,
