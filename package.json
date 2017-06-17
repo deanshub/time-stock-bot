@@ -19,6 +19,7 @@
   "author": "Dean Shub",
   "license": "ISC",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.1",
     "later": "^1.2.0",
     "node-telegram-bot-api": "^0.19.2",
     "q": "^1.4.1",

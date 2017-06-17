@@ -2,10 +2,12 @@
 var TelegramBot = require('node-telegram-bot-api');
 var later = require('later');
 var Q = require('q');
+var URL = require('url');
 
 const data = require('./data');
 var helpers = require('./helpers');
 var smartNotifier = require('./smartNotifier');
+var finvizScraper = require('./finvizScraper');
 var PREDICTION_SIGN = '~';
 var ALL_STOCKS_SIGN = '*';
 
@@ -83,6 +85,7 @@ function init() {
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
   bot.onText(/^\/info ([^ ]+)$/, infoHandler);
+  bot.onText(/^\/recomended$/, recomendedHandler);
 }
 
 
@@ -195,6 +198,18 @@ function getStocksSignOfUser(fromId){
     }
   }
   return stocks;
+}
+
+function recomendedHandler(msg){
+  var fromId = msg.from.id;
+  finvizScraper.recomended().then(urls=>{
+    urls.forEach(url=>{
+      const stockName = URL.parse(url).searchParams.get('t');
+      sendMessage(fromId, `[${stockName}](${url})`,
+        {disable_web_page_preview:false}
+      );
+    });
+  });
 }
 
 function finvizGraphHandler(msg) {
