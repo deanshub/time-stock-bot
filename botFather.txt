@@ -7,4 +7,5 @@ time - set full report time
 predict - send predictions
 graph - 3 day graph
 diff - stock diff to a number
+recomended - recomended stocks by finviz
 help  - help message

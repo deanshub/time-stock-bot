@@ -41,6 +41,7 @@ This is what I can do:
 /predict _<DAYS-OR-MONTHS>_ _<TIME-BACK>_ _<PERCENT>_ _<INTERVAL>_ _<TIME-FRAME>_ - shows prediction when to buy the stock,
          DAYS-OR-MONTHS = 1|0 TIME-BACK=number PERCENT=float INTERVAL=number TIME-FRAME=m|h|D
 /predict - if the previous defined then sends prediction immidiatly
+/recomended - sends out recomended stocks by finviz
 /help - to get this message
 
 *Examples:*
@@ -204,7 +205,7 @@ function recomendedHandler(msg){
   var fromId = msg.from.id;
   finvizScraper.recomended().then(urls=>{
     urls.forEach((url)=>{
-      const stockName = URL.parse(url).query.t;
+      const stockName = URL.parse(url,true).query.t;
       sendMessage(fromId, `[${stockName}](${url})`,
         {disable_web_page_preview:false}
       );
