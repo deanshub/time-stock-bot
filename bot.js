@@ -77,9 +77,9 @@ function init() {
   bot.onText(/\/add ([^ ]+)$/, stockAddHandler);
   bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
-  bot.onText(/\/graph *$/, finvizGraphHandler);
-  bot.onText(/\/graph ([^ ]+)$/, finvizStockGraphHandler);
-  bot.onText(/\/graph ([^ ]+) (\d+)([dym])?$/, graphHandler);
+  bot.onText(/^\/graph$/, finvizGraphHandler);
+  bot.onText(/^\/graph ([^ ]+)$/, finvizStockGraphHandler);
+  bot.onText(/^\/graph ([^ ]+) (\d+)([dym])?$/, graphHandler);
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
   bot.onText(/^\/info ([^ ]+)$/, infoHandler);
@@ -200,25 +200,25 @@ function getStocksSignOfUser(fromId){
 function finvizGraphHandler(msg) {
   var fromId = msg.from.id;
 
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_t.png',
+  sendMessage(fromId, '[Daily](http://finviz.com/grp_image.ashx?bar_sector_t.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_w.png',
+  sendMessage(fromId, '[Weekly](http://finviz.com/grp_image.ashx?bar_sector_w.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_m.png',
+  sendMessage(fromId, '[Monthly](http://finviz.com/grp_image.ashx?bar_sector_m.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_q.png',
+  sendMessage(fromId, '[Quartarly](http://finviz.com/grp_image.ashx?bar_sector_q.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_h.png',
+  sendMessage(fromId, '[6 Months](http://finviz.com/grp_image.ashx?bar_sector_h.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_y.png',
+  sendMessage(fromId, '[Yearly](http://finviz.com/grp_image.ashx?bar_sector_y.png)',
     {disable_web_page_preview:false}
   );
-  sendMessage(fromId, 'http://finviz.com/grp_image.ashx?bar_sector_ytd.png',
+  sendMessage(fromId, '[Year to Date](http://finviz.com/grp_image.ashx?bar_sector_ytd.png)',
     {disable_web_page_preview:false}
   );
 }
