@@ -78,7 +78,7 @@ function init() {
   bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
   bot.onText(/\/graph ([^ ]+)$/, finvizGraphHandler);
-  bot.onText(/\/graph ([^ ]+) ?(\d*)([dym])?$/, graphHandler);
+  bot.onText(/\/graph ([^ ]+) (\d+)([dym])?$/, graphHandler);
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
   bot.onText(/^\/info ([^ ]+)$/, infoHandler);
