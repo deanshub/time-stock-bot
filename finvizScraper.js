@@ -21,6 +21,6 @@ function recomended(){
   });
 }
 
-module.export = {
+module.exports = {
   recomended,
 };

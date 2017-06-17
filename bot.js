@@ -203,12 +203,15 @@ function getStocksSignOfUser(fromId){
 function recomendedHandler(msg){
   var fromId = msg.from.id;
   finvizScraper.recomended().then(urls=>{
-    urls.forEach(url=>{
-      const stockName = URL.parse(url).searchParams.get('t');
+    urls.forEach((url)=>{
+      const stockName = URL.parse(url).query.t;
       sendMessage(fromId, `[${stockName}](${url})`,
         {disable_web_page_preview:false}
       );
     });
+  }).catch(e=>{
+    console.error(e);
+    sendMessage(fromId, 'Sorry, can\'t get recomended stocks, try again later');
   });
 }
 
