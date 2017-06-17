@@ -77,6 +77,7 @@ function init() {
   bot.onText(/\/add ([^ ]+)$/, stockAddHandler);
   bot.onText(/\/remove ([^ ]+)$/, stockRemoveHandler);
   bot.onText(/\/time (.+)$/, allStocksTimeHandler);
+  bot.onText(/\/graph ([^ ]+)$/, finvizGraphHandler);
   bot.onText(/\/graph ([^ ]+) ?(\d*)([dym])?$/, graphHandler);
   bot.onText(/^\/predict ([01]) (\d+) (\d+(\.\d+)?) (\d+) ([mhD])$/, predictionHandler);
   bot.onText(/^\/predict$/, predictNowHandler);
@@ -193,6 +194,14 @@ function getStocksSignOfUser(fromId){
     }
   }
   return stocks;
+}
+
+function finvizGraphHandler(msg, match) {
+  var fromId = msg.from.id;
+  var stockSign = match[1];
+
+  sendMessage(fromId, 'http://finviz.com/chart.ashx?t='+stockSign+'&ty=c'+
+    '&p=d&ta=1',{disable_web_page_preview:false});
 }
 
 function graphHandler(msg, match) {
