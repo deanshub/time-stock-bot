@@ -397,6 +397,9 @@ function sendPredictions(fromId, daysOrMonths, timeBack, percentRatio) {
 
       sendMessage(fromId, predictionMessage);
     }
+  }).catch(function(err){
+    console.error(err);
+    console.error(`can't send predictions to ${fromId}`);
   });
 }
 
