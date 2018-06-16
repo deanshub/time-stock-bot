@@ -1,0 +1,5 @@
+{
+  "BOT_TOKEN": "",
+  "WEBHOOK_HOST": "stock.shubapp.com",
+  "WEBHOOK_PORT": 443
+}

@@ -2,9 +2,9 @@
   "name": "time-stock-bot",
   "version": "1.0.0",
   "description": "Telegram bot for stock information",
-  "main": "bot.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "nodemon bot.js"
+    "start": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -19,16 +19,23 @@
   "author": "Dean Shub",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "cheerio": "^1.0.0-rc.1",
+    "config": "^1.30.0",
+    "fs-extra": "^6.0.1",
     "later": "^1.2.0",
-    "node-telegram-bot-api": "^0.19.2",
+    "node-telegram-bot-api": "^0.30.0",
+    "nodemon": "^1.17.5",
     "q": "^1.4.1",
     "regression": "^1.2.1",
     "request": "^2.69.0"
   },
   "devDependencies": {
-    "babel-core": "^6.7.7",
-    "babel-eslint": "^6.0.3",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.3",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
     "eslint": "^2.8.0",
     "eslint-plugin-react": "^5.0.1"
   }
