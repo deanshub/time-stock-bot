@@ -68,70 +68,6 @@ function getStockBySign(stockSign, yahoo) {
   });
 }
 
-function numberWithSign(value) {
-  var parsedValue = 0;
-  var sign='+';
-  if (value!==undefined && value!==null){
-    parsedValue = value;
-  }
-  if (parsedValue<0){
-    sign = '-';
-  }
-
-  return sign + parsedValue.toFixed(2).replace(/[+-]/,'').trim();
-}
-
-function stockToMessage(stockValues) {
-  const symbolUpper = stockValues.symbol.toUpperCase();
-  var messageBody = `[${symbolUpper}  ${stockValues.currentValue.toFixed(2)}](https://finance.yahoo.com/quote/${symbolUpper})      ${numberWithSign(stockValues.change)} (${numberWithSign(stockValues.pchange)}%)\n`;
-
-  return messageBody;
-}
-
-function writeSchedules(schedules) {
-  var schedulesNesseccery = {};
-  try{
-    // creating schedules file (only nesseccery properties)
-    for (var userId in schedules){
-      for (var stockSign in schedules[userId]){
-        if (!schedulesNesseccery[userId]){
-          schedulesNesseccery[userId]={};
-        }
-        if (schedules[userId][stockSign]){
-          schedulesNesseccery[userId][stockSign] = {
-            textTime: schedules[userId][stockSign].textTime,
-            numberToDiff: schedules[userId][stockSign].numberToDiff,
-            daysOrMonths: schedules[userId][stockSign].daysOrMonths,
-            timeBack: schedules[userId][stockSign].timeBack,
-            percentRatio: schedules[userId][stockSign].percentRatio,
-          };
-        }
-      }
-    }
-
-    var schedulesString = JSON.stringify(schedulesNesseccery);
-    fs.writeFile('schedules.json',schedulesString,function (err) {
-      if(err)console.log(err);
-    });
-  }catch(e){
-    console.log(e);
-  }
-}
-
-function getSchedulesFromFile() {
-  return Q.promise(function (resolve, reject) {
-    fs.readFile('schedules.json','utf8',function (err, schedulesString) {
-      if (err) {
-        console.log(err);
-        reject(err);
-      }else{
-        var schedules = JSON.parse(schedulesString);
-        resolve(schedules);
-      }
-    });
-  });
-}
-
 function stringToNumber(value){
   var returnValue = undefined;
   try {
@@ -152,9 +88,5 @@ function fill(text){
 
 module.exports = {
   getStockBySign: getStockBySign,
-  stockToMessage: stockToMessage,
-  writeSchedules: writeSchedules,
-  getSchedulesFromFile: getSchedulesFromFile,
   fill: fill,
-  numberWithSign: numberWithSign,
 };
