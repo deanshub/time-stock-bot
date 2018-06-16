@@ -45,7 +45,7 @@ function getCurrentDataOfStocks(stocks) {
           processedStocks[stock.Symbol] = bestAskFor(stock);
         }
         resolve(processedStocks);
-      });
+      }).catch(reject);
   });
 }
 
