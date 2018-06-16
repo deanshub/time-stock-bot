@@ -4,3 +4,4 @@ post-receive
 *.lock
 config/production.json
 schedules.json
+dist/
