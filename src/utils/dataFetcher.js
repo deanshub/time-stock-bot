@@ -119,24 +119,6 @@ function normalizeStock(body, apiIndex){
   return parsedStock;
 }
 
-// function getCurrentSingleStockData(stock, apiIndex = 0) {
-//   return new Promise((resolve, reject)=>{
-//     if (apiIndex<APIS.length){
-//       const stockQuery = buildQuery(stock, apiIndex);
-//       return axios.get(stockQuery).then(({data})=>{
-//         return resolve(normalizeStock(data, apiIndex));
-//       }).catch(reject);
-//     }
-//     return reject('Can\'t get current data of stock');
-//   }).catch(()=>{
-//     if (apiIndex<APIS.length){
-//       return getCurrentSingleStockData(stock, apiIndex+1);
-//     }else{
-//       return Promise.reject('Can\'t get current data of stock');
-//     }
-//   });
-// }
-
 function getCurrentSingleStockData(stock, apiIndex = 0) {
   if (apiIndex<APIS.length){
     const stockQuery = buildQuery(stock, apiIndex);

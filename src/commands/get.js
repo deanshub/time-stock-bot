@@ -68,7 +68,7 @@ function valuesToMessage(stockValues){
 }
 
 function calcPDiff(initialValue, finalValue){
-  const diff = initialValue - finalValue;
+  const diff = finalValue - initialValue;
   return diff / initialValue * 100;
 }
 
