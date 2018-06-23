@@ -45,7 +45,7 @@ export function sendMessage(id, message, extraOps){
 let commands = {};
 export function addCommand(command, fn){
   commands[`${command.name}.${command.fn}`] = fn;
-  return bot.onText(command.regex, fn);
+  bot.onText(command.regex, fn);
 }
 
 export function runCommand(command, msg, match, fnName='default'){

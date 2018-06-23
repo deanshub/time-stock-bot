@@ -1,6 +1,7 @@
 import botCommander from '../botCommander';
 import stateManager from '../stateManager';
 import dataFetcher from '../utils/dataFetcher';
+import {runPromises} from '../utils/promises';
 
 export function singleStock(msg, match){
   const fromId = msg.from.id;
@@ -14,16 +15,16 @@ export function allStocks(msg){
   const stocks = stateManager.getStocksSymbolOfUser(fromId);
 
   if (stocks.length>0){
-    var allMessagesPromises = stocks.map(stockSign => getStockMessage(fromId, stockSign));
+    var allMessagesPromises = stocks.map(stockSign => ()=>getStockMessage(fromId, stockSign));
     // TODO: might be better to Promise.resolveAll instead of Promise.all
-    return Promise.all(allMessagesPromises).then(allMessages=>{
+    return runPromises(allMessagesPromises, 2).then(allMessages=>{
       return botCommander.sendMessage(fromId, allMessages.join(''));
     }).catch(function (err) {
       console.error(err);
-      botCommander.sendMessage(fromId, `Can't get all your stocks\nPlease try again later`);
+      return botCommander.sendMessage(fromId, `Can't get all your stocks\nPlease try again later`);
     });
   }else{
-    botCommander.sendMessage(fromId, `You don't have any scheduled stocks\nTry /add <STOCK_NAME> or /help`);
+    return botCommander.sendMessage(fromId, 'You don\'t have any scheduled stocks\nTry /add <STOCK_NAME> or /help');
   }
 }
 

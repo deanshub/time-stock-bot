@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {runPromises} from './promises'
 
 const APIS = [
   'ALPHAVANTAGE',
@@ -128,34 +129,6 @@ function getCurrentSingleStockData(stock, apiIndex = 0) {
   }
   return Promise.reject(`Can't get current data of stock "${stock}"`);
 }
-
-const runPromises = (promises, count) => {
-  return new Promise((resolve) => {
-    let nextPromise = 0;
-    let fullfildPromises = 0;
-
-    const responses = new Array(promises.length);
-
-    const runSinglePromise = (currentIndex) => {
-      nextPromise++;
-      promises[currentIndex]().then((res) => {
-        fullfildPromises++;
-        responses[currentIndex] = res;
-        if (fullfildPromises === promises.length){
-          resolve(responses);
-        }
-
-        if (nextPromise < promises.length){
-          runSinglePromise(nextPromise);
-        }
-      });
-    };
-
-    for (let i = 0; i < Math.min(promises.length, count); i++) {
-      runSinglePromise(i);
-    }
-  });
-};
 
 export function getCurrentData(stocks=[]){
   return runPromises(stocks.map((stock)=>{
