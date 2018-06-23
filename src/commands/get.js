@@ -17,7 +17,7 @@ export function allStocks(msg){
   if (stocks.length>0){
     var allMessagesPromises = stocks.map(stockSign => ()=>getStockMessage(fromId, stockSign));
     // TODO: might be better to Promise.resolveAll instead of Promise.all
-    return runPromises(allMessagesPromises, 2).then(allMessages=>{
+    return runPromises(allMessagesPromises, 4).then(allMessages=>{
       return botCommander.sendMessage(fromId, allMessages.join(''));
     }).catch(function (err) {
       console.error(err);
