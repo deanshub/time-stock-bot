@@ -92,6 +92,14 @@ export default [{
   disabled: false,
   description: 'Predict now by previously defined parameters',
 },{
+  name: 'info',
+  regex: /^\/info ([^ ]+)$/,
+  params: [
+    'stock-symbol',
+  ],
+  disabled: false,
+  description: 'Get all information on the stock',
+},{
   disabled: false,
   name: 'help',
   regex:/\/help/,
