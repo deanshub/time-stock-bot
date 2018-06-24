@@ -80,7 +80,7 @@ function getNumberDiff(fromId, stockSign, currentValue) {
     const diffNumber = currentValue - originalValue;
     const diffPercentage = calcPDiff(originalValue, currentValue);
 
-    const diffPrefix = '_Diff:_'.padStart(10).padEnd(50);
+    const diffPrefix = '_Diff:_'.padStart(10).padEnd(40);
     return `${diffPrefix}${numberWithSign(diffNumber)} (*${numberWithSign(diffPercentage)}%*)\n`;
   }
   return '';
