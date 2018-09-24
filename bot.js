@@ -61,18 +61,6 @@ function stocksAlreadyAlerted(stock){
   return false;
 }
 
-
-function infoHandler(msg, match) {
-  var fromId = msg.from.id;
-  var stockSign = match[1];
-  smartNotifier.getPredictionInfo(stockSign).then(function (stockInfo) {
-    sendMessage(fromId, stockInfo);
-  }).catch(function (err) {
-    console.log(err);
-    sendMessage(fromId, 'I got a problem when I tried to get the information, sorry...');
-  });
-}
-
 function sendMessage(id, message, extraOps){
   bot.sendMessage(id, message, Object.assign({},allKeyboardOpts,extraOps));
 }
