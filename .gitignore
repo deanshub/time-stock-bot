@@ -1,7 +1,6 @@
 node_modules/
 post-receive
 *.pem
-*.lock
 config/production.json
 schedules.json
 dist/

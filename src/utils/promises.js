@@ -33,3 +33,13 @@ export function runPromises(promises, count=2) {
     }
   });
 }
+
+export function retryPromise(promisefn, args, count=1) {
+  if (count<=0){
+    return Promise.reject('failed');
+  }
+  return promisefn.apply(this, args).catch(e=>{
+    console.error(e, 'retrying');
+    return retryPromise(promisefn, args, count-1);
+  });
+}
