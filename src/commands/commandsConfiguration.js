@@ -9,6 +9,15 @@ export default [{
   description: 'Get stock current values',
 },{
   name: 'get',
+  fn: 'singleStockCmd',
+  regex: /\/get([^ ]+)$/,
+  params: [
+    'stock-symbol',
+  ],
+  disabled: false,
+  description: 'Get stock current values',
+},{
+  name: 'get',
   fn: 'allStocks',
   regex: /\/get$/,
   disabled: false,
