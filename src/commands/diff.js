@@ -11,11 +11,9 @@ export default function diffHandler(msg, match) {
     stateManager.set(`${key}.numberToDiff`, numberToDiff);
     stateManager.saveState();
 
-    botCommander.runCommand('get', msg, ['', stockSign], 'singleStock');
-    return true;
-  }else{
-    botCommander.sendMessage(fromId, `I didn't find any scheduling on ${stockSign}
-Try adding it by using the /add ${stockSign}`);
-    return false;
+    return botCommander.runCommand('get', msg, ['', stockSign], 'singleStock');
   }
+  
+  return botCommander.sendMessage(fromId, `I didn't find any scheduling on ${stockSign}
+Try adding it by using the /add ${stockSign}`);
 }
